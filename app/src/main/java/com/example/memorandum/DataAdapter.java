@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.litepal.crud.DataSupport;
+
 import java.util.List;
 
 /**
@@ -17,6 +19,7 @@ import java.util.List;
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     private List<Data> mDataList;
+    private List<Data> dataList;
     static class ViewHolder extends RecyclerView.ViewHolder {
         View dataView;
         TextView dataDate;
@@ -43,9 +46,12 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 Data data = mDataList.get(position);
+                String content = data.getContent();
 //                Toast.makeText(v.getContext(), "You clicked view" + data.getContent(), Toast.LENGTH_SHORT).show();
                 intent.setClass(parent.getContext(), MemorandumActivity.class);
+                intent.putExtra("content", content);
                 v.getContext().startActivity(intent);
+
             }
         });
         return holder;

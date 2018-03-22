@@ -12,7 +12,9 @@ public class Data extends DataSupport {
     private int id;
     private String date;
     private String content;
+    public Data() {
 
+    }
     public Data(String content, String date) {
         this.date = date;
         this.content = content;
