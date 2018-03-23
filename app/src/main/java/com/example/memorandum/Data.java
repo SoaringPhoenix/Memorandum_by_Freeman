@@ -12,9 +12,11 @@ public class Data extends DataSupport {
     private int id;
     private String date;
     private String content;
+    private String exactTime;
     public Data() {
 
     }
+
     public Data(String content, String date) {
         this.date = date;
         this.content = content;
@@ -42,5 +44,14 @@ public class Data extends DataSupport {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+
+    public String getExactTime() {
+        return exactTime;
+    }
+
+    public void setExactTime(String exactTime) {
+        this.exactTime = exactTime;
     }
 }

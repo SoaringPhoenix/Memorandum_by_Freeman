@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -15,6 +16,10 @@ import java.util.Date;
 
 public class MemorandumActivity extends AppCompatActivity {
     private EditText editText;
+    private TextView textView;
+    String currentContent;
+    String currentDate;
+    Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,10 +31,15 @@ public class MemorandumActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.back);
         }
+        textView = (TextView) findViewById(R.id.exact_time);
         editText = (EditText) findViewById(R.id.input);
-        Intent intent = getIntent();
-        String content = intent.getStringExtra("content");
-        editText.setText(content);
+        intent = getIntent();
+        currentContent = intent.getStringExtra("content");
+        currentDate = intent.getStringExtra("date");
+        editText.setText(currentContent);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH点mm分");
+        Date date = new Date(System.currentTimeMillis());
+        textView.setText(currentDate);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -46,10 +56,21 @@ public class MemorandumActivity extends AppCompatActivity {
                 Data data = new Data();
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
                 Date date = new Date(System.currentTimeMillis());
+                currentContent = intent.getStringExtra("content");
+
                 if (editText.getText().toString() != null && editText.getText().toString() != "") {
-                    data.setDate(simpleDateFormat.format(date));
-                    data.setContent(editText.getText().toString());
-                    data.save();
+                    if (currentContent == null || currentContent == "") {
+                        data.setDate(simpleDateFormat.format(date));
+                        data.setContent(editText.getText().toString());
+                        data.save();
+                    }
+                    else if (currentContent != null && currentContent != "" && !(editText.getText().toString().equals(currentContent))) {
+                        data.setDate(simpleDateFormat.format(date));
+                        data.setContent(editText.getText().toString());
+                        data.updateAll("date = ? and content = ?", currentDate, currentContent);
+                    }
+                } else {
+                    finish();
                 }
                 finish();
                 break;

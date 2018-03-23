@@ -46,10 +46,12 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 Data data = mDataList.get(position);
+                String date  = data.getDate();
                 String content = data.getContent();
 //                Toast.makeText(v.getContext(), "You clicked view" + data.getContent(), Toast.LENGTH_SHORT).show();
                 intent.setClass(parent.getContext(), MemorandumActivity.class);
                 intent.putExtra("content", content);
+                intent.putExtra("date", date);
                 v.getContext().startActivity(intent);
 
             }
