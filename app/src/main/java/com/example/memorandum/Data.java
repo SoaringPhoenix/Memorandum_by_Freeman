@@ -1,8 +1,10 @@
 package com.example.memorandum;
 
+import org.litepal.annotation.Column;
 import org.litepal.crud.DataSupport;
 
 import java.util.Date;
+
 
 /**
  * Created by jason on 2018/3/19.
@@ -11,8 +13,9 @@ import java.util.Date;
 public class Data extends DataSupport {
     private int id;
     private String date;
+    @Column(nullable = false)
     private String content;
-    private String exactTime;
+    private Date exactTime;
     public Data() {
 
     }
@@ -47,11 +50,11 @@ public class Data extends DataSupport {
     }
 
 
-    public String getExactTime() {
+    public Date getExactTime() {
         return exactTime;
     }
 
-    public void setExactTime(String exactTime) {
+    public void setExactTime(Date exactTime) {
         this.exactTime = exactTime;
     }
 }

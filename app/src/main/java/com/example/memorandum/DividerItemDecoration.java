@@ -37,7 +37,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     /**
      * 遍历childView，为每一个childView描绘divider
-     * @param c 画布对象
+     *
+     * @param c      画布对象
      * @param parent 父控件即RecyclerView
      */
     private void drawDivider(Canvas c, RecyclerView parent) {

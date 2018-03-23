@@ -11,6 +11,10 @@ import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,7 +23,7 @@ import java.util.List;
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     private List<Data> mDataList;
-    private List<Data> dataList;
+
     static class ViewHolder extends RecyclerView.ViewHolder {
         View dataView;
         TextView dataDate;
@@ -32,6 +36,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
             dataContent = (TextView) view.findViewById(R.id.data_content);
         }
     }
+
     public DataAdapter(List<Data> dataList) {
         mDataList = dataList;
     }
@@ -46,12 +51,16 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 Data data = mDataList.get(position);
-                String date  = data.getDate();
+                int id = data.getId();
+                String date = data.getDate();
                 String content = data.getContent();
+                Date exactTime = data.getExactTime();
 //                Toast.makeText(v.getContext(), "You clicked view" + data.getContent(), Toast.LENGTH_SHORT).show();
                 intent.setClass(parent.getContext(), MemorandumActivity.class);
+                intent.putExtra("id", id);
                 intent.putExtra("content", content);
                 intent.putExtra("date", date);
+                intent.putExtra("exactTime", exactTime);
                 v.getContext().startActivity(intent);
 
             }
@@ -62,8 +71,47 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Data data = mDataList.get(position);
-        holder.dataDate.setText(data.getDate());
-        holder.dataContent.setText(data.getContent());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+        Date date = new Date(System.currentTimeMillis());
+        try {
+            if (isToday(simpleDateFormat.format(date), data.getDate().substring(0, 11))) {
+                holder.dataDate.setText(data.getDate().substring(12));
+            } else {
+                holder.dataDate.setText(data.getDate().substring(0, 11));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        if (data.getContent().length() <= 20) {
+            holder.dataContent.setText(data.getContent());
+//        }
+//        else {
+//            holder.dataContent.setText(data.getContent().substring(0, 22));
+//        }
+    }
+
+    public static boolean isToday(String str, String formatStr) throws Exception {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
+        Date date = null;
+        try {
+            date = format.parse(str);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(date);
+        int year1 = c1.get(Calendar.YEAR);
+        int month1 = c1.get(Calendar.MONTH) + 1;
+        int day1 = c1.get(Calendar.DAY_OF_MONTH);
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+        int year2 = c2.get(Calendar.YEAR);
+        int month2 = c2.get(Calendar.MONTH) + 1;
+        int day2 = c2.get(Calendar.DAY_OF_MONTH);
+        if (year1 == year2 && month1 == month2 && day1 == day2) {
+            return true;
+        }
+        return false;
     }
 
     @Override

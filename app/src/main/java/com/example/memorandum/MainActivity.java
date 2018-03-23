@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private SwipeRefreshLayout swipeRefresh;
     private DataAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,10 +83,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-  public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolkit, menu);
         return true;
-  }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -99,9 +100,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        dataList = DataSupport.order("id desc").find(Data.class);
+        dataList = DataSupport.order("exactTime desc").find(Data.class);
     }
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+
+    //        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 //        Date date = new Date(System.currentTimeMillis());
 //        for (int i = 0; i < 5; i++) {
 //            Data data = new Data( "第" + i + "条数据", simpleDateFormat.format(date));
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
