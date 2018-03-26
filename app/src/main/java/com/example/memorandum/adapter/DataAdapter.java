@@ -1,4 +1,4 @@
-package com.example.memorandum;
+package com.example.memorandum.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,18 +6,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.memorandum.MemorandumActivity;
+import com.example.memorandum.R;
+import com.example.memorandum.bean.Data;
 
-import org.litepal.crud.DataSupport;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -110,10 +107,10 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
     private void showStar(ViewHolder holder, int currentId) {
         if (currentId == 1) {
-            Glide.with(context).load(R.drawable.star).asBitmap().into(holder.dataStar);
+            Glide.with(context).load(R.drawable.star_gold).asBitmap().into(holder.dataStar);
         }
         else {
-            Glide.with(context).load(R.drawable.star_hollow).asBitmap().into(holder.dataStar);
+            Glide.with(context).load(R.drawable.star_plain).asBitmap().into(holder.dataStar);
         }
     }
 

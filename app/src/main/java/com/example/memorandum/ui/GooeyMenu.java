@@ -1,4 +1,4 @@
-package com.example.memorandum;
+package com.example.memorandum.ui;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -22,6 +22,8 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.LinearInterpolator;
+
+import com.example.memorandum.R;
 
 import java.util.ArrayList;
 import java.util.List;

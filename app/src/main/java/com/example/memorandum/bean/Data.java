@@ -1,4 +1,4 @@
-package com.example.memorandum;
+package com.example.memorandum.bean;
 
 import org.litepal.annotation.Column;
 import org.litepal.crud.DataSupport;

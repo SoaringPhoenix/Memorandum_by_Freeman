@@ -19,14 +19,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
+
+import com.example.memorandum.adapter.DataAdapter;
+import com.example.memorandum.bean.Data;
+import com.example.memorandum.ui.DividerItemDecoration;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {

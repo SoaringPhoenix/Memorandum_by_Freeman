@@ -30,7 +30,7 @@
         android:id="@+id/insert_photo"
         android:layout_gravity="center_horizontal"/>
 
-    <com.example.memorandum.GooeyMenu
+    <com.example.memorandum.ui.GooeyMenu
         android:id="@+id/gooey_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -5,9 +5,9 @@
     <array name="drawable_array">
 
         <item>@drawable/item_selector_star</item>
-        <item>@drawable/selector_video</item>
-        <item>@drawable/selector_audio</item>
-        <item>@drawable/selector_photo</item>
-        <item>@drawable/selector_doc</item>
+        <item>@drawable/item_selector_pending</item>
+        <item>@drawable/item_selector_reminder</item>
+        <item>@drawable/item_selector_camera</item>
+        <item>@drawable/item_selector_picture</item>
     </array>
 </resources>

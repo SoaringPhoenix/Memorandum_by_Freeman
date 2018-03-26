@@ -9,13 +9,14 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+
+import com.example.memorandum.bean.Data;
+import com.example.memorandum.ui.GooeyMenu;
 
 import org.litepal.crud.DataSupport;
 import java.util.Date;

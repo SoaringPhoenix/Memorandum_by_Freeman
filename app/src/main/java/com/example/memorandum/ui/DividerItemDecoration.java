@@ -1,4 +1,4 @@
-package com.example.memorandum;
+package com.example.memorandum.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
