@@ -16,6 +16,16 @@ public class Data extends DataSupport {
     @Column(nullable = false)
     private String content;
     private Date exactTime;
+    private int star;
+
+    public int getStar() {
+        return star;
+    }
+
+    public void setStar(int star) {
+        this.star = star;
+    }
+
     public Data() {
 
     }

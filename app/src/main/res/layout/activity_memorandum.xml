@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -23,16 +24,22 @@
         android:layout_weight="20"
         android:gravity="top"
         android:paddingTop="0dp"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/insert_photo"
+        android:layout_gravity="center_horizontal"/>
+
+    <com.example.memorandum.GooeyMenu
+        android:id="@+id/gooey_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fab_radius="@dimen/big_circle_radius"
+        app:gap_between_menu_fab="@dimen/min_gap"
+        app:menu_radius="@dimen/small_circle_radius"
+        app:no_of_menu="5"
+        app:menu_drawable="@array/drawable_array"
+        tools:ignore="MissingPrefix" />
 </LinearLayout>
 
-
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--tools:context="com.example.memorandum.MemorandumActivity">-->
-
-<!--</android.support.constraint.ConstraintLayout>-->
 

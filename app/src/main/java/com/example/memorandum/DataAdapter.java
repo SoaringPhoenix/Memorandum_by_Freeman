@@ -1,13 +1,17 @@
 package com.example.memorandum;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import org.litepal.crud.DataSupport;
 
@@ -22,18 +26,21 @@ import java.util.List;
  */
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
+    private Context context;
     private List<Data> mDataList;
-
+    ImageView data_star;
     static class ViewHolder extends RecyclerView.ViewHolder {
         View dataView;
         TextView dataDate;
         TextView dataContent;
+        ImageView dataStar;
 
         public ViewHolder(View view) {
             super(view);
             dataView = view;
             dataDate = (TextView) view.findViewById(R.id.data_date);
             dataContent = (TextView) view.findViewById(R.id.data_content);
+            dataStar = (ImageView) view.findViewById(R.id.data_star);
         }
     }
 
@@ -43,7 +50,10 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.data_item, parent, false);
+        if (context == null) {
+            context = parent.getContext();
+        }
+        View view = LayoutInflater.from(context).inflate(R.layout.data_item, parent, false);
         final ViewHolder holder = new ViewHolder(view);
         final Intent intent = new Intent();
         holder.dataView.setOnClickListener(new View.OnClickListener() {
@@ -55,12 +65,14 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                 String date = data.getDate();
                 String content = data.getContent();
                 Date exactTime = data.getExactTime();
+                int star = data.getStar();
 //                Toast.makeText(v.getContext(), "You clicked view" + data.getContent(), Toast.LENGTH_SHORT).show();
-                intent.setClass(parent.getContext(), MemorandumActivity.class);
+                intent.setClass(context, MemorandumActivity.class);
                 intent.putExtra("id", id);
                 intent.putExtra("content", content);
                 intent.putExtra("date", date);
                 intent.putExtra("exactTime", exactTime);
+                intent.putExtra("star", star);
                 v.getContext().startActivity(intent);
 
             }
@@ -74,48 +86,35 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
         Date date = new Date(System.currentTimeMillis());
         try {
-            if (isToday(simpleDateFormat.format(date), data.getDate().substring(0, 11))) {
-                holder.dataDate.setText(data.getDate().substring(12));
-            } else {
+            if (!simpleDateFormat.format(date).equals(data.getDate().substring(0, 11))) {
                 holder.dataDate.setText(data.getDate().substring(0, 11));
+            } else {
+                holder.dataDate.setText(data.getDate().substring(12));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 //        if (data.getContent().length() <= 20) {
-            holder.dataContent.setText(data.getContent());
+        holder.dataContent.setText(data.getContent());
+        showStar(holder, data.getStar());
 //        }
 //        else {
 //            holder.dataContent.setText(data.getContent().substring(0, 22));
 //        }
     }
 
-    public static boolean isToday(String str, String formatStr) throws Exception {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
-        Date date = null;
-        try {
-            date = format.parse(str);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Calendar c1 = Calendar.getInstance();
-        c1.setTime(date);
-        int year1 = c1.get(Calendar.YEAR);
-        int month1 = c1.get(Calendar.MONTH) + 1;
-        int day1 = c1.get(Calendar.DAY_OF_MONTH);
-        Calendar c2 = Calendar.getInstance();
-        c2.setTime(new Date());
-        int year2 = c2.get(Calendar.YEAR);
-        int month2 = c2.get(Calendar.MONTH) + 1;
-        int day2 = c2.get(Calendar.DAY_OF_MONTH);
-        if (year1 == year2 && month1 == month2 && day1 == day2) {
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public int getItemCount() {
         return mDataList.size();
     }
+
+    private void showStar(ViewHolder holder, int currentId) {
+        if (currentId == 1) {
+            Glide.with(context).load(R.drawable.star).asBitmap().into(holder.dataStar);
+        }
+        else {
+            Glide.with(context).load(R.drawable.star_hollow).asBitmap().into(holder.dataStar);
+        }
+    }
+
 }

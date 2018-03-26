@@ -17,6 +17,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private SwipeRefreshLayout swipeRefresh;
     private DataAdapter adapter;
+    private ImageView data_star;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,4 +149,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
+
+
 }

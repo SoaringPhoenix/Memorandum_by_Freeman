@@ -8,7 +8,6 @@
         android:id="@+id/icon_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/avril"
         android:layout_centerInParent="true" />
 
     <TextView
