@@ -14,15 +14,21 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SearchView;
 
 
 import com.example.memorandum.adapter.DataAdapter;
+import com.example.memorandum.adapter.SimpleItemTouchHelperCallback;
 import com.example.memorandum.bean.Data;
 import com.example.memorandum.ui.DividerItemDecoration;
+import com.example.memorandum.ui.SwipeItemLayout;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
@@ -36,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefresh;
     private DataAdapter adapter;
     private ImageView data_star;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,15 +76,41 @@ public class MainActivity extends AppCompatActivity {
                 v.getContext().startActivity(intent);
             }
         });
-
+        searchView = (SearchView) findViewById(R.id.search_view);
         initData();
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new DataAdapter(dataList);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
+        recyclerView.addOnItemTouchListener(new SwipeItemLayout.OnSwipeItemTouchListener(this));
+//        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+//        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+//        touchHelper.attachToRecyclerView(recyclerView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+                recyclerView.setLayoutManager(layoutManager);
+                if (!TextUtils.isEmpty(newText)) {
+                    dataList = DataSupport.order("exactTime desc").where("content like ?", "%" + newText + "%").find(Data.class);
+                    adapter = new DataAdapter(dataList);
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    dataList = DataSupport.order("exactTime desc").find(Data.class);
+                    adapter = new DataAdapter(dataList);
+                    recyclerView.setAdapter(adapter);
+                }
+                return false;
+            }
+        });
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -142,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
                         recyclerView.setLayoutManager(layoutManager);
                         adapter = new DataAdapter(dataList);
                         recyclerView.setAdapter(adapter);
-                        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext()));
                         adapter.notifyDataSetChanged();
                         swipeRefresh.setRefreshing(false);
                     }
@@ -150,6 +182,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
-
-
 }

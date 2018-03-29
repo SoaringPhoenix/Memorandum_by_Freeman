@@ -1,6 +1,10 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/visibility_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -12,15 +16,12 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-    <!--<android.support.design.widget.CoordinatorLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" >-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:id="@+id/exact_time" />
-    <com.example.memorandum.ui.RichEditText
+    <EditText
         android:id="@+id/input"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -43,7 +44,11 @@
         app:no_of_menu="5"
         app:menu_drawable="@array/drawable_array"
         tools:ignore="MissingPrefix" />
-<!--</android.support.design.widget.CoordinatorLayout>-->
 </LinearLayout>
-
+    <View
+    android:layout_width="1dp"
+    android:layout_height="match_parent"
+    android:layout_alignParentLeft="true"
+    android:background="#000" />
+</RelativeLayout>
 

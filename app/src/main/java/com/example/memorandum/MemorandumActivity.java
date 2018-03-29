@@ -1,11 +1,20 @@
 package com.example.memorandum;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,13 +26,18 @@ import android.widget.Toast;
 
 import com.example.memorandum.bean.Data;
 import com.example.memorandum.ui.GooeyMenu;
+import com.example.memorandum.ui.RichEditText;
 
 import org.litepal.crud.DataSupport;
+
+import java.io.FileNotFoundException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+import static com.example.memorandum.util.CommonUtility.resizeImage;
+
 public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.GooeyMenuInterface {
-    private EditText editText;
+    private RichEditText richEditText;
     private TextView textView;
     private ImageView data_star;
     private GooeyMenu gooeyMenu;
@@ -34,6 +48,8 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
     String currentTime;
     Intent intent;
     Data data = new Data();
+    private static final int PHOTO_SUCCESS = 1;
+    private static final int CAMERA_SUCCESS = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +62,18 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.back);
         }
+        intent = getIntent();
         gooeyMenu = (GooeyMenu) findViewById(R.id.gooey_menu);
         gooeyMenu.setOnMenuListener(this);
         textView = (TextView) findViewById(R.id.exact_time);
-        editText = (EditText) findViewById(R.id.input);
-        intent = getIntent();
+        richEditText = (RichEditText) findViewById(R.id.input);
         currentId = intent.getIntExtra("id", 0);
         currentContent = intent.getStringExtra("content");
         currentDate = intent.getStringExtra("date");
         currentTime = intent.getStringExtra("exactTime");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
         Date date = new Date(System.currentTimeMillis());
-        editText.setText(currentContent);
+        richEditText.setText(currentContent);
         textView.setText(currentDate);
         if (TextUtils.isEmpty(textView.getText())) {
             textView.setText(simpleDateFormat.format(date));
@@ -81,22 +97,21 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                 currentContent = intent.getStringExtra("content");
                 currentTime = intent.getStringExtra("exactTime");
 
-                if (!TextUtils.isEmpty(editText.getText())) {
+                if (!TextUtils.isEmpty(richEditText.getText())) {
                     if (currentContent == null || currentContent == "") {
                         data.setDate(simpleDateFormat.format(date));
                         data.setExactTime(date);
-                        data.setContent(editText.getText().toString());
+                        data.setContent(richEditText.getText().toString());
                         data.save();
-                    } else if (currentContent != null && currentContent != "" && !(editText.getText().toString().equals(currentContent))) {
+                    } else if (currentContent != null && currentContent != "" && !(richEditText.getText().toString().equals(currentContent))) {
                         data.setDate(simpleDateFormat.format(date));
                         data.setExactTime(date);
-                        data.setContent(editText.getText().toString());
+                        data.setContent(richEditText.getText().toString());
                         data.update(currentId);
 //                        data.updateAll("date = ? and content = ?",currentDate, currentContent);
                     }
                 } else {
                     DataSupport.delete(Data.class, currentId);
-                    finish();
                 }
                 finish();
                 break;
@@ -107,20 +122,38 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
 
     @Override
     public void menuOpen() {
-        showToast("Menu Open");
+//        showToast("Menu Open");
 
     }
 
     @Override
     public void menuClose() {
-        showToast( "Menu Close");
+//        showToast( "Menu Close");
     }
 
     @Override
     public void menuItemClicked(int menuNumber) {
-        showToast( "Menu item clicked : " + menuNumber);
         switch (menuNumber) {
             case 1:
+                showToast("insert picture");
+                Intent getImage = new Intent(Intent.ACTION_GET_CONTENT);
+                getImage.addCategory(Intent.CATEGORY_OPENABLE);
+                getImage.setType("image/*");
+                startActivityForResult(getImage, PHOTO_SUCCESS);
+                break;
+            case 2:
+                showToast("insert photo");
+                Intent getImageByCamera= new Intent("android.media.action.IMAGE_CAPTURE");
+                startActivityForResult(getImageByCamera, CAMERA_SUCCESS);
+                break;
+            case 3:
+                showToast("reminder");
+                break;
+            case 4:
+                showToast("pending");
+                break;
+            case 5:
+                showToast("favorite");
                 intent = getIntent();
                 currentId = intent.getIntExtra("id", 0);
                 if (currentId == 0) {
@@ -130,18 +163,72 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                     currentId = 0;
                 }
                 break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
             default:
         }
     }
-    private void showToast(String msg){
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        ContentResolver resolver = getContentResolver();
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case PHOTO_SUCCESS:
+                    //获得图片的uri
+                    Uri originalUri = intent.getData();
+                    Bitmap bitmap = null;
+                    try {
+                        Bitmap originalBitmap = BitmapFactory.decodeStream(resolver.openInputStream(originalUri));
+                        bitmap = resizeImage(originalBitmap, 720, 1280);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    if(bitmap != null){
+                        //根据Bitmap对象创建ImageSpan对象
+                        ImageSpan imageSpan = new ImageSpan(MemorandumActivity.this, bitmap);
+                        //创建一个SpannableString对象，以便插入用ImageSpan对象封装的图像
+                        SpannableString spannableString = new SpannableString("[local]"+1+"[/local]");
+                        //  用ImageSpan对象替换face
+                        spannableString.setSpan(imageSpan, 0, "[local]1[local]".length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        //将选择的图片追加到EditText中光标所在位置
+                        int index = richEditText.getSelectionStart(); //获取光标所在位置
+                        Editable edit_text = richEditText.getEditableText();
+                        if(index <0 || index >= edit_text.length()){
+                            edit_text.append(spannableString);
+                        }else{
+                            edit_text.insert(index, spannableString);
+                        }
+                    }else{
+                        Toast.makeText(MemorandumActivity.this, "获取图片失败", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case CAMERA_SUCCESS:
+                    Bundle extras = intent.getExtras();
+                    Bitmap originalBitmap1 = (Bitmap) extras.get("data");
+                    if(originalBitmap1 != null){
+                        bitmap = resizeImage(originalBitmap1, 720, 1280);
+                        //根据Bitmap对象创建ImageSpan对象
+                        ImageSpan imageSpan = new ImageSpan(MemorandumActivity.this, bitmap);
+                        //创建一个SpannableString对象，以便插入用ImageSpan对象封装的图像
+                        SpannableString spannableString = new SpannableString("[local]"+1+"[/local]");
+                        //  用ImageSpan对象替换face
+                        spannableString.setSpan(imageSpan, 0, "[local]1[local]".length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        //将选择的图片追加到EditText中光标所在位置
+                        int index =  richEditText.getSelectionStart(); //获取光标所在位置
+                        Editable edit_text = richEditText.getEditableText();
+                        if(index <0 || index >= edit_text.length()){
+                            edit_text.append(spannableString);
+                        }else{
+                            edit_text.insert(index, spannableString);
+                        }
+                    }else{
+                        Toast.makeText(MemorandumActivity.this, "获取图片失败", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    public void showToast(String msg){
         if(mToast!=null){
             mToast.cancel();
         }
@@ -149,6 +236,4 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
         mToast.setGravity(Gravity.CENTER,0,0);
         mToast.show();
     }
-
-
 }
