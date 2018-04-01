@@ -25,7 +25,6 @@ import android.widget.SearchView;
 
 
 import com.example.memorandum.adapter.DataAdapter;
-import com.example.memorandum.adapter.SimpleItemTouchHelperCallback;
 import com.example.memorandum.bean.Data;
 import com.example.memorandum.ui.DividerItemDecoration;
 import com.example.memorandum.ui.SwipeItemLayout;
@@ -85,9 +84,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.addOnItemTouchListener(new SwipeItemLayout.OnSwipeItemTouchListener(this));
-//        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-//        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-//        touchHelper.attachToRecyclerView(recyclerView);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

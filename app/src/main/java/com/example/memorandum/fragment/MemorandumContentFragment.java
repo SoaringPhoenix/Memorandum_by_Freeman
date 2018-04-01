@@ -37,8 +37,4 @@ public class MemorandumContentFragment extends Fragment {
 
         return root;
     }
-
-
-
-
 }

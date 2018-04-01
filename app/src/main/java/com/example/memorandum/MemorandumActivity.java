@@ -15,6 +15,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,8 +32,10 @@ import com.example.memorandum.ui.RichEditText;
 import org.litepal.crud.DataSupport;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import static com.example.memorandum.util.CommonUtility.resizeImage;
 
@@ -43,6 +46,9 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
     private GooeyMenu gooeyMenu;
     private Toast mToast;
     int currentId;
+    int currentStar;
+    int currentPending;
+    int currentReminder;
     String currentContent;
     String currentDate;
     String currentTime;
@@ -50,6 +56,8 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
     Data data = new Data();
     private static final int PHOTO_SUCCESS = 1;
     private static final int CAMERA_SUCCESS = 2;
+
+    private static final String TAG = "MemorandumActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +75,9 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
         gooeyMenu.setOnMenuListener(this);
         textView = (TextView) findViewById(R.id.exact_time);
         richEditText = (RichEditText) findViewById(R.id.input);
+//        textView.bringToFront();
+//        richEditText.bringToFront();
+        gooeyMenu.bringToFront();
         currentId = intent.getIntExtra("id", 0);
         currentContent = intent.getStringExtra("content");
         currentDate = intent.getStringExtra("date");
@@ -95,7 +106,7 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                 Date date = new Date(System.currentTimeMillis());
                 currentId = intent.getIntExtra("id", 0);
                 currentContent = intent.getStringExtra("content");
-                currentTime = intent.getStringExtra("exactTime");
+//                currentTime = intent.getStringExtra("exactTime");
 
                 if (!TextUtils.isEmpty(richEditText.getText())) {
                     if (currentContent == null || currentContent == "") {
@@ -133,34 +144,77 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
 
     @Override
     public void menuItemClicked(int menuNumber) {
+
+        currentId = intent.getIntExtra("id", 0);
+        Data data =  getIntent().getParcelableExtra("data");
         switch (menuNumber) {
             case 1:
-                showToast("insert picture");
+//                showToast("insert picture");
                 Intent getImage = new Intent(Intent.ACTION_GET_CONTENT);
                 getImage.addCategory(Intent.CATEGORY_OPENABLE);
                 getImage.setType("image/*");
                 startActivityForResult(getImage, PHOTO_SUCCESS);
                 break;
             case 2:
-                showToast("insert photo");
+//                showToast("insert photo");
                 Intent getImageByCamera= new Intent("android.media.action.IMAGE_CAPTURE");
                 startActivityForResult(getImageByCamera, CAMERA_SUCCESS);
                 break;
             case 3:
                 showToast("reminder");
+                if (data.getReminder() == 2) {
+                    data.setReminder(1);
+                    data.update(currentId);
+                    currentReminder = data.getReminder();
+                    Log.d(TAG, String.valueOf(currentReminder));
+                    showToast("取消提醒");
+                }
+                else {
+                    data.setReminder(2);
+                    data.update(currentId);
+                    currentReminder = data.getReminder();
+                    Log.d(TAG, String.valueOf(currentReminder));
+                    showToast("已提醒");
+                }
                 break;
             case 4:
                 showToast("pending");
+                if (data.getPending() == 2) {
+                    data.setPending(1);
+                    data.update(currentId);
+                    currentPending = data.getPending();
+                    Log.d(TAG, String.valueOf(currentPending));
+                    showToast("取消待办");
+                }
+                else {
+                    data.setPending(2);
+                    data.update(currentId);
+                    currentPending = data.getPending();
+                    Log.d(TAG, String.valueOf(currentPending));
+                    showToast("已待办");
+                }
                 break;
             case 5:
                 showToast("favorite");
-                intent = getIntent();
-                currentId = intent.getIntExtra("id", 0);
-                if (currentId == 0) {
-                    currentId = 1;
+//                List<Data> stars;
+//                stars = DataSupport.select("star").where("id = ?", String.valueOf(currentId)).find(Data.class);
+//                for (Data star: stars) {
+//                    currentStar = star.getStar();
+//                    Log.d(TAG, String.valueOf(currentStar));
+//                }
+                if (data.getStar() == 2) {
+                    data.setStar(1);
+                    data.update(currentId);
+                    currentStar = data.getStar();
+                    Log.d(TAG, String.valueOf(currentStar));
+                    showToast("取消收藏");
                 }
-                else if (currentId == 1) {
-                    currentId = 0;
+                else {
+                    data.setStar(2);
+                    data.update(currentId);
+                    currentStar = data.getStar();
+                    Log.d(TAG, String.valueOf(currentStar));
+                    showToast("已收藏");
                 }
                 break;
             default:
@@ -175,8 +229,9 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                     //获得图片的uri
                     Uri originalUri = intent.getData();
                     Bitmap bitmap = null;
+                    Bitmap originalBitmap = null;
                     try {
-                        Bitmap originalBitmap = BitmapFactory.decodeStream(resolver.openInputStream(originalUri));
+                        originalBitmap = BitmapFactory.decodeStream(resolver.openInputStream(originalUri));
                         bitmap = resizeImage(originalBitmap, 720, 1280);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();

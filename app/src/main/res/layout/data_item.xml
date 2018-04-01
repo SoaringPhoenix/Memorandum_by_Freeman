@@ -33,6 +33,7 @@
     <ImageView
         android:layout_width="5dp"
         android:layout_height="5dp"
+        android:src="@drawable/star_plain"
         android:id="@+id/data_star"/>
 
 </LinearLayout>
@@ -53,13 +54,16 @@
             <!--android:layout_height="match_parent" />-->
 
         <Button
-            android:id="@+id/mark"
-            android:text="收藏"
+            android:id="@+id/favorite"
+
             android:textColor="#ffffff"
             android:textSize="16sp"
-            android:background="@drawable/btn_mark"
+
             android:layout_width="100dp"
             android:layout_height="match_parent" />
+        <!--android:text="收藏"-->
+        <!--android:background="@drawable/btn_mark"-->
+
 
         <Button
             android:id="@+id/delete"

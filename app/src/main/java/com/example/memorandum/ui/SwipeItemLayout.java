@@ -772,5 +772,4 @@ public class SwipeItemLayout extends ViewGroup {
             }
         }
     }
-
 }

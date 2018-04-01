@@ -27,11 +27,7 @@
         android:layout_weight="20"
         android:gravity="top"
         android:paddingTop="0dp"/>
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/insert_photo"
-        android:layout_gravity="center_horizontal"/>
+
 
     <com.example.memorandum.ui.GooeyMenu
         android:id="@+id/gooey_menu"

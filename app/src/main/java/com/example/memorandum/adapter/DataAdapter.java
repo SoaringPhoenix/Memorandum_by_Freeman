@@ -2,10 +2,13 @@ package com.example.memorandum.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +33,11 @@ import java.util.List;
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
     private Context context;
     private List<Data> mDataList;
+    private Button delete;
+    private Button favorite;
+    private ImageView dataStar;
+    int currentStar;
+    private static final String TAG = "DataAdapter";
 
 //    @Override
 //    public void onItemMove(int fromPosition, int toPosition) {
@@ -59,11 +67,14 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             dataDate = (TextView) view.findViewById(R.id.data_date);
             dataContent = (TextView) view.findViewById(R.id.data_content);
             dataStar = (ImageView) view.findViewById(R.id.data_star);
+            dataStar.setImageResource(R.drawable.star_gold);
             View main = itemView.findViewById(R.id.main);
             main.setOnClickListener(this);
             main.setOnLongClickListener(this);
-            View delete = itemView.findViewById(R.id.delete);
+            delete = (Button) itemView.findViewById(R.id.delete);
+            favorite = (Button) itemView.findViewById(R.id.favorite);
             delete.setOnClickListener(this);
+            favorite.setOnClickListener(this);
         }
 
         @Override
@@ -71,21 +82,49 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             int position = getAdapterPosition();
             Data data = mDataList.get(position);
             int id = data.getId();
+            favorite = (Button) itemView.findViewById(R.id.favorite);
+            if (data.getStar() == 2) {
+                favorite.setText("取消收藏");
+                favorite.setBackgroundResource(R.drawable.btn_mark_grey);
+            }
+            else {
+                favorite.setText("收藏");
+                favorite.setBackgroundResource(R.drawable.btn_mark);
+            }
             switch (v.getId()) {
                 case R.id.main:
 //                    Toast.makeText(v.getContext(), "点击了main，位置为：" + getAdapterPosition(), Toast.LENGTH_SHORT).show();
                     String date = data.getDate();
                     String content = data.getContent();
-                    Date exactTime = data.getExactTime();
                     int star = data.getStar();
+                    int pending = data.getPending();
+                    int reminder = data.getReminder();
                     intent.setClass(v.getContext(), MemorandumActivity.class);
-//                    intent.setClass(v.getContext(), MemorandumContentFragment.class);
                     intent.putExtra("id", id);
                     intent.putExtra("content", content);
                     intent.putExtra("date", date);
-                    intent.putExtra("exactTime", exactTime);
-                    intent.putExtra("star", star);
+                    intent.putExtra("data", data);
                     v.getContext().startActivity(intent);
+                    break;
+                case R.id.favorite:
+                    if (currentStar == 2) {
+                        data.setStar(1);
+                        data.update(id);
+                        currentStar = data.getStar();
+                        Log.d(TAG, String.valueOf(currentStar));
+                        favorite.setText("收藏");
+                        favorite.setBackgroundResource(R.drawable.btn_mark);
+                        Toast.makeText(v.getContext(), "取消收藏", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        data.setStar(2);
+                        data.update(id);
+                        currentStar = data.getStar();
+                        Log.d(TAG, String.valueOf(currentStar));
+                        favorite.setText("取消收藏");
+                        favorite.setBackgroundResource(R.drawable.btn_mark_grey);
+                        Toast.makeText(v.getContext(), "已收藏", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case R.id.delete:
                     DataSupport.delete(Data.class, id);
@@ -144,7 +183,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         Date date = new Date(System.currentTimeMillis());
         try {
             if (!simpleDateFormat.format(date).equals(data.getDate().substring(0, 11))) {
-                holder.dataDate.setText(data.getDate().substring(0, 11));
+                holder.dataDate.setText(data.getDate().substring(5, 11));
             } else {
                 holder.dataDate.setText(data.getDate().substring(12));
             }
@@ -165,9 +204,10 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         return mDataList.size();
     }
 
-    private void showStar(ViewHolder holder, int currentId) {
-        if (currentId == 1) {
+    private void showStar(ViewHolder holder, int currentStar) {
+        if (currentStar == 2) {
             Glide.with(context).load(R.drawable.star_gold).asBitmap().into(holder.dataStar);
+//            dataStar = (ImageView) view.findViewById(R.id.data_star);
         }
         else {
             Glide.with(context).load(R.drawable.star_plain).asBitmap().into(holder.dataStar);
