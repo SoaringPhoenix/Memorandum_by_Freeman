@@ -2,14 +2,16 @@
     android:layout_width="match_parent"
     android:layout_height="180dp"
     android:padding="10dp"
-    android:background="?attr/colorPrimary" >
+    android:background="@color/default_color" >
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/icon_image"
+        android:src="@drawable/head"
+
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerInParent="true" />
-
+    <!--android:background="#c8fafa"-->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

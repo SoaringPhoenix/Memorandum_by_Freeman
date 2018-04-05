@@ -19,9 +19,13 @@ public class Data extends DataSupport implements Parcelable {
     @Column(nullable = false)
     private String content;
     private Date exactTime;
+    @Column(nullable = false)
     private int star;
+    @Column(nullable = false)
     private int pending;
+    @Column(nullable = false)
     private int reminder;
+    private User user;
 
     public Data() {
 
@@ -30,6 +34,14 @@ public class Data extends DataSupport implements Parcelable {
     public Data(String content, String date) {
         this.date = date;
         this.content = content;
+    }
+
+    public Data(String content, String date, int star, int pending, int reminder) {
+        this.content = content;
+        this.date = date;
+        this.star = star;
+        this.pending = pending;
+        this.reminder = reminder;
     }
 
     public int getId() {

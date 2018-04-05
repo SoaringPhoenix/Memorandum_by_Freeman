@@ -2,7 +2,6 @@ package com.example.memorandum.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,15 +13,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.memorandum.MemorandumActivity;
+import com.example.memorandum.activity.MemorandumActivity;
 import com.example.memorandum.R;
 import com.example.memorandum.bean.Data;
-import com.example.memorandum.fragment.MemorandumContentFragment;
 
 import org.litepal.crud.DataSupport;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -35,30 +32,16 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
     private List<Data> mDataList;
     private Button delete;
     private Button favorite;
-    private ImageView dataStar;
     int currentStar;
-    private static final String TAG = "DataAdapter";
 
-//    @Override
-//    public void onItemMove(int fromPosition, int toPosition) {
-//        // 交换位置
-//        Collections.swap(mDataList, fromPosition, toPosition);
-//        notifyItemMoved(fromPosition, toPosition);
-//    }
-//
-//    @Override
-//    public void onItemDissmiss(int position) {
-//        Data data = mDataList.get(position);
-//        int id = data.getId();
-//        DataSupport.delete(Data.class, id);
-//        mDataList.remove(position);
-//        notifyItemRemoved(position);
-//    }
+    private static final String TAG = "DataAdapter";
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         View dataView;
         TextView dataDate;
         TextView dataContent;
+        ImageView dataPending;
+        ImageView dataReminder;
         ImageView dataStar;
         Intent intent = new Intent();
         public ViewHolder(View view) {
@@ -66,8 +49,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             dataView = view;
             dataDate = (TextView) view.findViewById(R.id.data_date);
             dataContent = (TextView) view.findViewById(R.id.data_content);
+            dataPending = (ImageView) view.findViewById(R.id.data_pending);
+            dataReminder = (ImageView) view.findViewById(R.id.data_reminder);
             dataStar = (ImageView) view.findViewById(R.id.data_star);
-            dataStar.setImageResource(R.drawable.star_gold);
             View main = itemView.findViewById(R.id.main);
             main.setOnClickListener(this);
             main.setOnLongClickListener(this);
@@ -96,9 +80,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
 //                    Toast.makeText(v.getContext(), "点击了main，位置为：" + getAdapterPosition(), Toast.LENGTH_SHORT).show();
                     String date = data.getDate();
                     String content = data.getContent();
-                    int star = data.getStar();
-                    int pending = data.getPending();
-                    int reminder = data.getReminder();
                     intent.setClass(v.getContext(), MemorandumActivity.class);
                     intent.putExtra("id", id);
                     intent.putExtra("content", content);
@@ -151,28 +132,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         }
         View view = LayoutInflater.from(context).inflate(R.layout.data_item, parent, false);
         final ViewHolder holder = new ViewHolder(view);
-//        final Intent intent = new Intent();
-//        holder.dataView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                int position = holder.getAdapterPosition();
-//                Data data = mDataList.get(position);
-//                int id = data.getId();
-//                String date = data.getDate();
-//                String content = data.getContent();
-//                Date exactTime = data.getExactTime();
-//                int star = data.getStar();
-//                Toast.makeText(v.getContext(), "You clicked view" + data.getContent(), Toast.LENGTH_SHORT).show();
-//                intent.setClass(context, MemorandumActivity.class);
-//                intent.putExtra("id", id);
-//                intent.putExtra("content", content);
-//                intent.putExtra("date", date);
-//                intent.putExtra("exactTime", exactTime);
-//                intent.putExtra("star", star);
-//                v.getContext().startActivity(intent);
-//
-//            }
-//        });
         return holder;
     }
 
@@ -192,6 +151,8 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         }
 //        if (data.getContent().length() <= 20) {
         holder.dataContent.setText(data.getContent());
+        showPending(holder, data.getPending());
+        showReminder(holder, data.getReminder());
         showStar(holder, data.getStar());
 //        }
 //        else {
@@ -204,10 +165,25 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         return mDataList.size();
     }
 
+    private void showPending(ViewHolder holder, int currentPending) {
+        if (currentPending == 2) {
+            Glide.with(context).load(R.drawable.pending).asBitmap().into(holder.dataPending);
+        }
+        else {
+            Glide.with(context).load(R.drawable.pending_plain).asBitmap().into(holder.dataPending);
+        }
+    }
+    private void showReminder(ViewHolder holder, int currentReminder) {
+        if (currentReminder == 2) {
+            Glide.with(context).load(R.drawable.reminder).asBitmap().into(holder.dataReminder);
+        }
+        else {
+            Glide.with(context).load(R.drawable.reminder_plain).asBitmap().into(holder.dataReminder);
+        }
+    }
     private void showStar(ViewHolder holder, int currentStar) {
         if (currentStar == 2) {
-            Glide.with(context).load(R.drawable.star_gold).asBitmap().into(holder.dataStar);
-//            dataStar = (ImageView) view.findViewById(R.id.data_star);
+            Glide.with(context).load(R.drawable.star).asBitmap().into(holder.dataStar);
         }
         else {
             Glide.with(context).load(R.drawable.star_plain).asBitmap().into(holder.dataStar);

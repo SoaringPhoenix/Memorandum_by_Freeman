@@ -26,6 +26,7 @@
         android:layout_height="0dp"
         android:layout_weight="20"
         android:gravity="top"
+        android:background="@null"
         android:paddingTop="0dp"/>
 
 

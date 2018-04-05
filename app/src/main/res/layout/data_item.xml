@@ -2,9 +2,6 @@
     android:layout_width="match_parent"
     android:layout_height="75dp">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-<LinearLayout
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -28,15 +25,25 @@
             android:id="@+id/data_date"/>
 
 
+        <ImageView
+            android:layout_width="18sp"
+            android:layout_height="18sp"
+            android:src="@drawable/pending_plain"
+            android:id="@+id/data_pending"/>
+
+        <ImageView
+            android:layout_width="18sp"
+            android:layout_height="18sp"
+            android:src="@drawable/reminder_plain"
+            android:id="@+id/data_reminder"/>
+
+        <ImageView
+            android:layout_width="18sp"
+            android:layout_height="18sp"
+            android:src="@drawable/star_plain"
+            android:id="@+id/data_star"/>
 
     </LinearLayout>
-    <ImageView
-        android:layout_width="5dp"
-        android:layout_height="5dp"
-        android:src="@drawable/star_plain"
-        android:id="@+id/data_star"/>
-
-</LinearLayout>
 
 </LinearLayout>
 
@@ -55,10 +62,10 @@
 
         <Button
             android:id="@+id/favorite"
-
             android:textColor="#ffffff"
             android:textSize="16sp"
-
+            android:text="收藏"
+            android:background="@drawable/btn_mark"
             android:layout_width="100dp"
             android:layout_height="match_parent" />
         <!--android:text="收藏"-->

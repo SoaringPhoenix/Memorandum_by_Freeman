@@ -1,15 +1,25 @@
 package com.example.memorandum.util;
 
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.view.Gravity;
 import android.widget.Toast;
+
+import com.example.memorandum.bean.Data;
+
+import org.litepal.crud.DataSupport;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jason on 2018/3/29.
  */
 
 public class CommonUtility {
+
+    static List<Data> dataList = new ArrayList<>();
     /**
      * 图片缩放
      * @param originalBitmap 原始的Bitmap
@@ -34,5 +44,21 @@ public class CommonUtility {
         // 创建新的图片Bitmap
         Bitmap resizedBitmap = Bitmap.createBitmap(originalBitmap,0,0,width,height,matrix,true);
         return resizedBitmap;
+    }
+
+    public static List<Data> getRawData(String... sql) {
+        Cursor cursor = DataSupport.findBySQL(sql);
+        if (cursor.moveToFirst()) {
+            do {
+                String date = cursor.getString(cursor.getColumnIndex("date"));
+                String content = cursor.getString(cursor.getColumnIndex("content"));
+                int star = cursor.getInt(cursor.getColumnIndex("star"));
+                int pending = cursor.getInt(cursor.getColumnIndex("pending"));
+                int reminder = cursor.getInt(cursor.getColumnIndex("reminder"));
+                dataList.add(new Data(content, date, star, pending, reminder));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return dataList;
     }
 }

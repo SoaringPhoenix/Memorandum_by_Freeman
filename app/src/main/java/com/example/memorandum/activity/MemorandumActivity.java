@@ -1,10 +1,10 @@
-package com.example.memorandum;
+package com.example.memorandum.activity;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,30 +19,31 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+import com.example.memorandum.R;
 import com.example.memorandum.bean.Data;
+import com.example.memorandum.service.AlarmService;
 import com.example.memorandum.ui.GooeyMenu;
 import com.example.memorandum.ui.RichEditText;
+import com.fourmob.datetimepicker.date.DatePickerDialog;
+import com.sleepbot.datetimepicker.time.RadialPickerLayout;
+import com.sleepbot.datetimepicker.time.TimePickerDialog;
 
 import org.litepal.crud.DataSupport;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 import static com.example.memorandum.util.CommonUtility.resizeImage;
 
-public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.GooeyMenuInterface {
+public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.GooeyMenuInterface, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private RichEditText richEditText;
     private TextView textView;
-    private ImageView data_star;
     private GooeyMenu gooeyMenu;
     private Toast mToast;
     int currentId;
@@ -54,15 +55,29 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
     String currentTime;
     Intent intent;
     Data data = new Data();
+
     private static final int PHOTO_SUCCESS = 1;
     private static final int CAMERA_SUCCESS = 2;
 
+    DatePickerDialog datePickerDialog = null;
+    TimePickerDialog timePickerDialog = null;
+    String dateSet = "";
+    String timeSet = "";
+    StringBuilder timeSetTotal = new StringBuilder();
+    public static final String DATEPICKER_TAG = "datepicker";
+    public static final String TIMEPICKER_TAG = "timepicker";
     private static final String TAG = "MemorandumActivity";
+    private static Context sContext = null;
+
+    public static Context getContext() {
+        return sContext;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memorandum);
+        sContext = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -75,13 +90,12 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
         gooeyMenu.setOnMenuListener(this);
         textView = (TextView) findViewById(R.id.exact_time);
         richEditText = (RichEditText) findViewById(R.id.input);
-//        textView.bringToFront();
-//        richEditText.bringToFront();
         gooeyMenu.bringToFront();
         currentId = intent.getIntExtra("id", 0);
         currentContent = intent.getStringExtra("content");
         currentDate = intent.getStringExtra("date");
         currentTime = intent.getStringExtra("exactTime");
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
         Date date = new Date(System.currentTimeMillis());
         richEditText.setText(currentContent);
@@ -89,6 +103,11 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
         if (TextUtils.isEmpty(textView.getText())) {
             textView.setText(simpleDateFormat.format(date));
         }
+
+        final Calendar calendar = Calendar.getInstance();
+        datePickerDialog = DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        timePickerDialog = TimePickerDialog.newInstance(this, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false, false);
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,7 +125,6 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                 Date date = new Date(System.currentTimeMillis());
                 currentId = intent.getIntExtra("id", 0);
                 currentContent = intent.getStringExtra("content");
-//                currentTime = intent.getStringExtra("exactTime");
 
                 if (!TextUtils.isEmpty(richEditText.getText())) {
                     if (currentContent == null || currentContent == "") {
@@ -146,7 +164,7 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
     public void menuItemClicked(int menuNumber) {
 
         currentId = intent.getIntExtra("id", 0);
-        Data data =  getIntent().getParcelableExtra("data");
+        Data data = getIntent().getParcelableExtra("data");
         switch (menuNumber) {
             case 1:
 //                showToast("insert picture");
@@ -157,23 +175,28 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                 break;
             case 2:
 //                showToast("insert photo");
-                Intent getImageByCamera= new Intent("android.media.action.IMAGE_CAPTURE");
+                Intent getImageByCamera = new Intent("android.media.action.IMAGE_CAPTURE");
                 startActivityForResult(getImageByCamera, CAMERA_SUCCESS);
                 break;
             case 3:
                 showToast("reminder");
+
+                timePickerDialog.show(getSupportFragmentManager(), TIMEPICKER_TAG);
+                datePickerDialog.setYearRange(1985, 2028);
+                datePickerDialog.show(getSupportFragmentManager(), DATEPICKER_TAG);
+
+
                 if (data.getReminder() == 2) {
                     data.setReminder(1);
                     data.update(currentId);
                     currentReminder = data.getReminder();
-                    Log.d(TAG, String.valueOf(currentReminder));
+//                    Log.d(TAG, String.valueOf(currentReminder));
                     showToast("取消提醒");
-                }
-                else {
+                } else {
                     data.setReminder(2);
                     data.update(currentId);
                     currentReminder = data.getReminder();
-                    Log.d(TAG, String.valueOf(currentReminder));
+//                    Log.d(TAG, String.valueOf(currentReminder));
                     showToast("已提醒");
                 }
                 break;
@@ -185,8 +208,7 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                     currentPending = data.getPending();
                     Log.d(TAG, String.valueOf(currentPending));
                     showToast("取消待办");
-                }
-                else {
+                } else {
                     data.setPending(2);
                     data.update(currentId);
                     currentPending = data.getPending();
@@ -208,8 +230,7 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                     currentStar = data.getStar();
                     Log.d(TAG, String.valueOf(currentStar));
                     showToast("取消收藏");
-                }
-                else {
+                } else {
                     data.setStar(2);
                     data.update(currentId);
                     currentStar = data.getStar();
@@ -236,45 +257,45 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    if(bitmap != null){
+                    if (bitmap != null) {
                         //根据Bitmap对象创建ImageSpan对象
                         ImageSpan imageSpan = new ImageSpan(MemorandumActivity.this, bitmap);
                         //创建一个SpannableString对象，以便插入用ImageSpan对象封装的图像
-                        SpannableString spannableString = new SpannableString("[local]"+1+"[/local]");
+                        SpannableString spannableString = new SpannableString("[local]" + 1 + "[/local]");
                         //  用ImageSpan对象替换face
-                        spannableString.setSpan(imageSpan, 0, "[local]1[local]".length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannableString.setSpan(imageSpan, 0, "[local]1[local]".length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         //将选择的图片追加到EditText中光标所在位置
                         int index = richEditText.getSelectionStart(); //获取光标所在位置
                         Editable edit_text = richEditText.getEditableText();
-                        if(index <0 || index >= edit_text.length()){
+                        if (index < 0 || index >= edit_text.length()) {
                             edit_text.append(spannableString);
-                        }else{
+                        } else {
                             edit_text.insert(index, spannableString);
                         }
-                    }else{
+                    } else {
                         Toast.makeText(MemorandumActivity.this, "获取图片失败", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case CAMERA_SUCCESS:
                     Bundle extras = intent.getExtras();
                     Bitmap originalBitmap1 = (Bitmap) extras.get("data");
-                    if(originalBitmap1 != null){
+                    if (originalBitmap1 != null) {
                         bitmap = resizeImage(originalBitmap1, 720, 1280);
                         //根据Bitmap对象创建ImageSpan对象
                         ImageSpan imageSpan = new ImageSpan(MemorandumActivity.this, bitmap);
                         //创建一个SpannableString对象，以便插入用ImageSpan对象封装的图像
-                        SpannableString spannableString = new SpannableString("[local]"+1+"[/local]");
+                        SpannableString spannableString = new SpannableString("[local]" + 1 + "[/local]");
                         //  用ImageSpan对象替换face
-                        spannableString.setSpan(imageSpan, 0, "[local]1[local]".length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannableString.setSpan(imageSpan, 0, "[local]1[local]".length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         //将选择的图片追加到EditText中光标所在位置
-                        int index =  richEditText.getSelectionStart(); //获取光标所在位置
+                        int index = richEditText.getSelectionStart(); //获取光标所在位置
                         Editable edit_text = richEditText.getEditableText();
-                        if(index <0 || index >= edit_text.length()){
+                        if (index < 0 || index >= edit_text.length()) {
                             edit_text.append(spannableString);
-                        }else{
+                        } else {
                             edit_text.insert(index, spannableString);
                         }
-                    }else{
+                    } else {
                         Toast.makeText(MemorandumActivity.this, "获取图片失败", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -283,12 +304,56 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
             }
         }
     }
-    public void showToast(String msg){
-        if(mToast!=null){
+
+    public void showToast(String msg) {
+        if (mToast != null) {
             mToast.cancel();
         }
-        mToast= Toast.makeText(this,msg,Toast.LENGTH_SHORT);
-        mToast.setGravity(Gravity.CENTER,0,0);
+        mToast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+        mToast.setGravity(Gravity.CENTER, 0, 0);
         mToast.show();
+    }
+
+
+    @Override
+    public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
+//        dateSet = year + "-" + month + "-" + day;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String.format("%d-%02d-%02d", year, month + 1, day));
+        dateSet = stringBuilder.toString();
+    }
+
+    @Override
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+        timeSetTotal.delete(0, timeSetTotal.length());
+//        timeSet = " " + hourOfDay + ":" + minute;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(hourOfDay < 10 ? "0" + hourOfDay : hourOfDay).append(":").append(minute < 10 ? "0" + minute : minute);
+        timeSet = stringBuilder.toString();
+        timeSetTotal = timeSetTotal.append(dateSet).append(" ").append(timeSet);
+        Data data = getIntent().getParcelableExtra("data");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date date;
+        long notifyTime = 0;
+        long currentTime = System.currentTimeMillis();
+        try {
+            date = simpleDateFormat.parse(timeSetTotal.toString());
+            notifyTime = date.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Log.i(TAG, "我擦，转换出错了");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i(TAG, "出了其他的错误啊");
+        }
+        if (notifyTime <= currentTime) {
+            showToast("选择时间不能小于当前时间");
+            return;
+        }
+        Log.i(TAG, timeSetTotal.toString());
+        Log.i(TAG, "选择时间: " + Integer.toString((int) notifyTime));
+        Log.i(TAG, "真实时间: " + Integer.toString((int) currentTime));
+        int delayTime = (int) (notifyTime - currentTime);
+        AlarmService.addNotification(delayTime, "tick", "您有一条新提醒", data.getContent(), data.getDate(), data.getId());
     }
 }
