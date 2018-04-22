@@ -2,6 +2,8 @@ package com.example.memorandum.activity;
 
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -15,22 +17,26 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.example.memorandum.R;
 import com.example.memorandum.adapter.DataAdapter;
 import com.example.memorandum.bean.Data;
+import com.example.memorandum.dao.DataDAO;
 import com.example.memorandum.ui.DividerItemDecoration;
 import com.example.memorandum.ui.SwipeItemLayout;
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 import java.util.ArrayList;
 import java.util.List;
+import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.example.memorandum.util.CommonUtility.getRawData;
 
 public class MainActivity extends AppCompatActivity {
     private List<Data> dataList = new ArrayList<>();
@@ -38,21 +44,37 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefresh;
     private DataAdapter adapter;
     private SearchView searchView;
-
+    private static final String TAG = "MainActivity";
+    private DataDAO dataDAO = new DataDAO();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        if (Build.VERSION.SDK_INT >= 21) {
+//            View decorView = getWindow().getDecorView();
+//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
         setContentView(R.layout.activity_main);
         LitePal.getDatabase();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolkit);
         setSupportActionBar(toolbar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerView = navigationView.inflateHeaderView(R.layout.nav_header);
+        CircleImageView headerImage = (CircleImageView) headerView.findViewById(R.id.icon_image);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.menu);
         }
+        headerImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Toast.makeText(v.getContext(), "You clicked header", Toast.LENGTH_SHORT);
+                Intent intent = new Intent(MainActivity.this , LoginActivity.class);
+                startActivity(intent);
+            }
+        });
         navigationView.setCheckedItem(R.id.nav_memo);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -94,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         searchView = (SearchView) findViewById(R.id.search_view);
-        initData();
+        dataList = dataDAO.getData();
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -117,32 +139,29 @@ public class MainActivity extends AppCompatActivity {
                 if (!TextUtils.isEmpty(newText)) {
                     dataList.clear();
                     if (getTitle() == "备忘录") {
-                        dataList = DataSupport.order("exactTime desc").where("content like ?", "%" + newText + "%").find(Data.class);
+                        dataList = dataDAO.queryData(newText);
                     }
                     else if (getTitle() == "待办") {
-                        dataList = getRawData("select date, content, star, pending, reminder from Data where pending = ? " +
-                                "and content like ? order by exactTime desc", "2", "%" + newText + "%");
+                        dataList = dataDAO.queryPending(newText);
                     }
                     else if (getTitle() == "提醒") {
-                        dataList = getRawData("select date, content, star, pending, reminder from Data where reminder = ? " +
-                                "and content like ? order by exactTime desc", "2", "%" + newText + "%");
+                        dataList = dataDAO.queryReminder(newText);
                     }
                     else if (getTitle() == "收藏") {
-                        dataList = getRawData("select date, content, star, pending, reminder from Data where star = ? " +
-                                "and content like ? order by exactTime desc", "2", "%" + newText + "%");
+                        dataList = dataDAO.queryFavorites(newText);
                     }
                 } else {
                     if (getTitle() == "待办") {
-                        dataList = DataSupport.where("pending = ?", "2").order("exactTime desc").find(Data.class);
+                        dataList = dataDAO.getPending();
                     }
                     else if (getTitle() == "提醒") {
-                        dataList = DataSupport.where("reminder = ?", "2").order("exactTime desc").find(Data.class);
+                        dataList = dataDAO.getReminder();
                     }
                     else if (getTitle() == "收藏") {
-                        dataList = DataSupport.where("star = ?", "2").order("exactTime desc").find(Data.class);
+                        dataList = dataDAO.getFavorites();
                     }
                     else {
-                        dataList = DataSupport.order("exactTime desc").find(Data.class);
+                        dataList = dataDAO.getData();
                     }
                 }
                 adapter = new DataAdapter(dataList);
@@ -184,28 +203,23 @@ public class MainActivity extends AppCompatActivity {
         searchView.requestFocus();
     }
 
-
-    private void initData() {
-        dataList = DataSupport.order("exactTime desc").find(Data.class);
-    }
-
     private void initMemo() {
-        dataList = DataSupport.order("exactTime desc").find(Data.class);
+        dataList = dataDAO.getData();
         initRecyclerView();
     }
 
     private void initPending() {
-        dataList = DataSupport.where("pending = ?", "2").order("exactTime desc").find(Data.class);
+        dataList = dataDAO.getPending();
         initRecyclerView();
     }
 
     private void initReminder() {
-        dataList = DataSupport.where("reminder = ?", "2").order("exactTime desc").find(Data.class);
+        dataList = dataDAO.getReminder();
         initRecyclerView();
     }
 
     private void initFavorites() {
-        dataList = DataSupport.where("star = ?", "2").order("exactTime desc").find(Data.class);
+        dataList = dataDAO.getFavorites();
         initRecyclerView();
     }
 

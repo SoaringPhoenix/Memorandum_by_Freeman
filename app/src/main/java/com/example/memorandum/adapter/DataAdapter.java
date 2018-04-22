@@ -2,6 +2,8 @@ package com.example.memorandum.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,9 +35,26 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
     private Button delete;
     private Button favorite;
     int currentStar;
+    public static final int favoriteNo = 1;
+    public static final int favoriteYes = 2;
 
     private static final String TAG = "DataAdapter";
-
+    private Handler handler = new Handler() {
+      public void handleMessage(Message message) {
+          switch (message.what) {
+              case favoriteNo:
+                  favorite.setText("收藏");
+                  favorite.setBackgroundResource(R.drawable.btn_mark);
+                  break;
+              case favoriteYes:
+                  favorite.setText("取消收藏");
+                  favorite.setBackgroundResource(R.drawable.btn_mark_grey);
+                  break;
+              default:
+                  break;
+          }
+      }
+    };
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         View dataView;
         TextView dataDate;
@@ -68,12 +87,10 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             int id = data.getId();
             favorite = (Button) itemView.findViewById(R.id.favorite);
             if (data.getStar() == 2) {
-                favorite.setText("取消收藏");
-                favorite.setBackgroundResource(R.drawable.btn_mark_grey);
+
             }
             else {
-                favorite.setText("收藏");
-                favorite.setBackgroundResource(R.drawable.btn_mark);
+
             }
             switch (v.getId()) {
                 case R.id.main:
@@ -88,6 +105,8 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
                     v.getContext().startActivity(intent);
                     break;
                 case R.id.favorite:
+                    currentStar = data.getStar();
+                    Message message = new Message();
                     if (currentStar == 2) {
                         data.setStar(1);
                         data.update(id);
@@ -96,6 +115,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
                         favorite.setText("收藏");
                         favorite.setBackgroundResource(R.drawable.btn_mark);
                         Toast.makeText(v.getContext(), "取消收藏", Toast.LENGTH_SHORT).show();
+                        message.what = favoriteNo;
                     }
                     else {
                         data.setStar(2);
@@ -105,7 +125,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
                         favorite.setText("取消收藏");
                         favorite.setBackgroundResource(R.drawable.btn_mark_grey);
                         Toast.makeText(v.getContext(), "已收藏", Toast.LENGTH_SHORT).show();
+                        message.what = favoriteYes;
                     }
+                    handler.sendMessage(message);
                     break;
                 case R.id.delete:
                     DataSupport.delete(Data.class, id);
@@ -182,6 +204,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         }
     }
     private void showStar(ViewHolder holder, int currentStar) {
+
         if (currentStar == 2) {
             Glide.with(context).load(R.drawable.star).asBitmap().into(holder.dataStar);
         }

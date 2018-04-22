@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,11 +21,13 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.memorandum.R;
 import com.example.memorandum.bean.Data;
+import com.example.memorandum.dao.DataDAO;
 import com.example.memorandum.service.AlarmService;
 import com.example.memorandum.ui.GooeyMenu;
 import com.example.memorandum.ui.RichEditText;
@@ -38,7 +42,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-
 import static com.example.memorandum.util.CommonUtility.resizeImage;
 
 public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.GooeyMenuInterface, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
@@ -50,11 +53,13 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
     int currentStar;
     int currentPending;
     int currentReminder;
+    String newContent;
     String currentContent;
     String currentDate;
     String currentTime;
     Intent intent;
     Data data = new Data();
+    DataDAO dataDAO = new DataDAO();
 
     private static final int PHOTO_SUCCESS = 1;
     private static final int CAMERA_SUCCESS = 2;
@@ -76,6 +81,11 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        if (Build.VERSION.SDK_INT >= 21) {
+//            View decorView = getWindow().getDecorView();
+//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
         setContentView(R.layout.activity_memorandum);
         sContext = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -124,23 +134,27 @@ public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.G
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
                 Date date = new Date(System.currentTimeMillis());
                 currentId = intent.getIntExtra("id", 0);
+                Data data = new Data(currentId);
                 currentContent = intent.getStringExtra("content");
-
+                currentDate = simpleDateFormat.format(date);
+                currentPending = data.getPending();
+                currentReminder = data.getReminder();
+                currentStar = data.getStar();
                 if (!TextUtils.isEmpty(richEditText.getText())) {
-                    if (currentContent == null || currentContent == "") {
-                        data.setDate(simpleDateFormat.format(date));
-                        data.setExactTime(date);
-                        data.setContent(richEditText.getText().toString());
-                        data.save();
-                    } else if (currentContent != null && currentContent != "" && !(richEditText.getText().toString().equals(currentContent))) {
-                        data.setDate(simpleDateFormat.format(date));
-                        data.setExactTime(date);
-                        data.setContent(richEditText.getText().toString());
-                        data.update(currentId);
+                    if (currentContent == null || currentContent == "") { //目前没有内容，此处为插入
+                        newContent = richEditText.getText().toString();
+                        Data newData = new Data(currentDate, newContent, date, currentPending, currentReminder, currentStar);
+                        dataDAO.insertData(newData);
+                    }
+                    else if (currentContent != null && currentContent != "" && !(richEditText.getText().toString().equals(currentContent))) { //有内容，此处为更新
+                        newContent = richEditText.getText().toString();
+                        Data newData = new Data(currentDate, newContent, date, currentPending, currentReminder, currentStar);
+                        dataDAO.updateData(newData, currentId);
 //                        data.updateAll("date = ? and content = ?",currentDate, currentContent);
                     }
-                } else {
-                    DataSupport.delete(Data.class, currentId);
+                }
+                else {
+                    dataDAO.deleteData(currentId);
                 }
                 finish();
                 break;

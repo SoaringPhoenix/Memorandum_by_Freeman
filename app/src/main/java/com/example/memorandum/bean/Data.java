@@ -30,7 +30,9 @@ public class Data extends DataSupport implements Parcelable {
     public Data() {
 
     }
-
+    public Data(int id) {
+        this.id = id;
+    }
     public Data(String content, String date) {
         this.date = date;
         this.content = content;
@@ -42,6 +44,14 @@ public class Data extends DataSupport implements Parcelable {
         this.star = star;
         this.pending = pending;
         this.reminder = reminder;
+    }
+    public Data(String date, String content, Date exactTime, int pending, int reminder, int star) {
+        this.date = date;
+        this.content = content;
+        this.exactTime = exactTime;
+        this.pending = pending;
+        this.reminder = reminder;
+        this.star = star;
     }
 
     public int getId() {
