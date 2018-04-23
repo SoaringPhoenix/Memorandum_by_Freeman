@@ -16,8 +16,11 @@ import com.example.memorandum.R;
 import com.example.memorandum.dao.UserDAO;
 import com.example.memorandum.util.AppGlobal;
 
-public class LoginActivity extends AppCompatActivity {
-    private AutoCompleteTextView mEmailView;  //用户名
+import solid.ren.skinlibrary.base.SkinBaseActivity;
+
+public class LoginActivity extends SkinBaseActivity {
+//    private AutoCompleteTextView mEmailView;  //用户名
+    private EditText mEmailView;  //用户名
     private EditText mPasswordView;           //密码
 
     @Override
@@ -28,7 +31,9 @@ public class LoginActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolkit);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);   //用户名控件
+//        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);   //用户名控件
+        mEmailView = (EditText) findViewById(R.id.email);   //用户名控件
+
         mPasswordView = (EditText) findViewById(R.id.password);         //密码控件
         //登录按钮
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);

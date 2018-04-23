@@ -36,9 +36,10 @@ import org.litepal.crud.DataSupport;
 import java.util.ArrayList;
 import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
+import solid.ren.skinlibrary.base.SkinBaseActivity;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends SkinBaseActivity {
     private List<Data> dataList = new ArrayList<>();
     private DrawerLayout mDrawerLayout;
     private SwipeRefreshLayout swipeRefresh;

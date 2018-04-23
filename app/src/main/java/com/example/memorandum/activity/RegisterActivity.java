@@ -16,8 +16,11 @@ import com.example.memorandum.R;
 import com.example.memorandum.bean.User;
 import com.example.memorandum.dao.UserDAO;
 
-public class RegisterActivity extends AppCompatActivity {
-    private AutoCompleteTextView mEmailView;  //用户名
+import solid.ren.skinlibrary.base.SkinBaseActivity;
+
+public class RegisterActivity extends SkinBaseActivity {
+//    private AutoCompleteTextView mEmailView;  //用户名
+    private EditText mEmailView;  //用户名
     private EditText mPasswordView;           //密码
     private EditText repasswordView;              //确认密码
     private EditText nicknameView;                  //昵称
@@ -29,7 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolkit);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);//查找用户名控件
+        mEmailView = (EditText) findViewById(R.id.email);//查找用户名控件
         mPasswordView = (EditText) findViewById(R.id.password);      //查找密码控件
         repasswordView = (EditText) findViewById(R.id.repassword);         //重复密码控件
         nicknameView = (EditText) findViewById(R.id.nickname);                 //昵称控件
@@ -39,14 +42,15 @@ public class RegisterActivity extends AppCompatActivity {
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();//调用函数检查登陆信息是否合法
+                Toast.makeText(view.getContext(), "为社么没反应", Toast.LENGTH_SHORT);
+                attemptRegister();//调用函数检查登陆信息是否合法
             }
         });
     }
     /**
      * 输入的检查
      */
-    private void attemptLogin() {
+    private void attemptRegister() {
 
         // 初始化控件错误信息
         mEmailView.setError(null);

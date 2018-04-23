@@ -1,8 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolkit"
@@ -11,9 +10,8 @@
         android:background="@color/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
     <RelativeLayout
-        android:id="@+id/rl_resetpassword"
+        android:id="@+id/rl_blue"
         android:layout_width="match_parent"
         android:layout_height="50dip"
         android:background="@drawable/list_item_bg_white"
@@ -24,21 +22,29 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:paddingLeft="10dip"
-            android:text="重置密码"
+            android:text="蓝色"
             android:textColor="@android:color/black"
             android:textSize="14sp"
             android:typeface="serif" />
+
+        <!--<com.example.memorandum.ui.SwitchButton-->
+            <!--android:id="@+id/switch_notification"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerVertical="true" />-->
     </RelativeLayout>
 
-    <View
+    <TextView
+        android:id="@+id/textview1"
         android:layout_width="match_parent"
-        android:layout_height="0.5px"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="@color/btn_gray_normal" />
+        android:layout_height="1dip"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:background="#E6E6E6" />
 
     <RelativeLayout
-        android:id="@+id/rl_switchtheme"
+        android:id="@+id/rl_pink"
         android:layout_width="match_parent"
         android:layout_height="50dip"
         android:background="@drawable/list_item_bg_white"
@@ -49,21 +55,29 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:paddingLeft="10dip"
-            android:text="切换主题"
+            android:text="粉色"
             android:textColor="@android:color/black"
             android:textSize="14sp"
             android:typeface="serif" />
+
+        <!--<com.example.memorandum.ui.SwitchButton-->
+            <!--android:id="@+id/switch_sound"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerVertical="true" />-->
     </RelativeLayout>
 
-    <View
+    <TextView
+        android:id="@+id/textview2"
         android:layout_width="match_parent"
-        android:layout_height="0.5px"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="@color/btn_gray_normal" />
+        android:layout_height="1dip"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:background="#E6E6E6" />
 
     <RelativeLayout
-        android:id="@+id/rl_exportmemo"
+        android:id="@+id/rl_night"
         android:layout_width="match_parent"
         android:layout_height="50dip"
         android:background="@drawable/list_item_bg_white"
@@ -74,16 +88,16 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:paddingLeft="10dip"
-            android:text="导出备忘录"
+            android:text="夜间"
             android:textColor="@android:color/black"
             android:textSize="14sp"
             android:typeface="serif" />
-    </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5px"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="@color/btn_gray_normal" />
+        <!--<com.example.memorandum.ui.SwitchButton-->
+            <!--android:id="@+id/switch_vibrate"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerVertical="true" />-->
+    </RelativeLayout>
 </LinearLayout>

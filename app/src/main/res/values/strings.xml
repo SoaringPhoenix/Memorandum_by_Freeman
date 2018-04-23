@@ -5,7 +5,20 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_text">TextActivity</string>
     <string name="title_text">备忘录</string>
-
+    <string name="you_mobile">你的手机号码</string>
+    <string name="country_code">+86</string>
+    <string name="Verification_Code">验证码</string>
+    <string name="has_code">获取验证码</string>
+    <string name="input_pwd">填写密码</string>
+    <string name="new_password">新密码</string>
+    <string name="confirmpassword">确认密码</string>
+    <string name="resetPassword">重置密码</string>
+    <string name="register">用户注册</string>
+    <string name="example">例如：陈晨</string>
+    <string name="nickname">昵称</string>
+    <string name="password">密码</string>
+    <string name="repassword">确认密码</string>
+    <string name="login">登录</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

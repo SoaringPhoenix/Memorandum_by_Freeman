@@ -51,6 +51,8 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
                   favorite.setBackgroundResource(R.drawable.btn_mark_grey);
                   break;
               default:
+                  favorite.setText("收藏");
+                  favorite.setBackgroundResource(R.drawable.btn_mark);
                   break;
           }
       }
@@ -78,6 +80,8 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             favorite = (Button) itemView.findViewById(R.id.favorite);
             delete.setOnClickListener(this);
             favorite.setOnClickListener(this);
+
+
         }
 
         @Override
@@ -86,12 +90,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             Data data = mDataList.get(position);
             int id = data.getId();
             favorite = (Button) itemView.findViewById(R.id.favorite);
-            if (data.getStar() == 2) {
-
-            }
-            else {
-
-            }
             switch (v.getId()) {
                 case R.id.main:
 //                    Toast.makeText(v.getContext(), "点击了main，位置为：" + getAdapterPosition(), Toast.LENGTH_SHORT).show();
@@ -176,6 +174,17 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         showPending(holder, data.getPending());
         showReminder(holder, data.getReminder());
         showStar(holder, data.getStar());
+        for (int i = 0; i <= position; i++) {
+            if (data.getStar() == 2) {
+                favorite.setText("取消收藏");
+                favorite.setBackgroundResource(R.drawable.btn_mark_grey);
+
+
+            } else if (data.getStar() == 1) {
+                favorite.setText("收藏");
+                favorite.setBackgroundResource(R.drawable.btn_mark);
+            }
+        }
 //        }
 //        else {
 //            holder.dataContent.setText(data.getContent().substring(0, 22));
@@ -192,7 +201,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             Glide.with(context).load(R.drawable.pending).asBitmap().into(holder.dataPending);
         }
         else {
-            Glide.with(context).load(R.drawable.pending_plain).asBitmap().into(holder.dataPending);
+//            Glide.with(context).load(R.drawable.pending_plain).asBitmap().into(holder.dataPending);
+//           holder.dataPending.setBackgroundResource(0);
+           holder.dataPending.setWillNotDraw(true);
         }
     }
     private void showReminder(ViewHolder holder, int currentReminder) {
@@ -200,7 +211,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             Glide.with(context).load(R.drawable.reminder).asBitmap().into(holder.dataReminder);
         }
         else {
-            Glide.with(context).load(R.drawable.reminder_plain).asBitmap().into(holder.dataReminder);
+//            Glide.with(context).load(R.drawable.reminder_plain).asBitmap().into(holder.dataReminder);
+//            holder.dataReminder.setBackgroundResource(0);
+            holder.dataReminder.setWillNotDraw(true);
         }
     }
     private void showStar(ViewHolder holder, int currentStar) {
@@ -209,7 +222,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
             Glide.with(context).load(R.drawable.star).asBitmap().into(holder.dataStar);
         }
         else {
-            Glide.with(context).load(R.drawable.star_plain).asBitmap().into(holder.dataStar);
+//            Glide.with(context).load(R.drawable.star_plain).asBitmap().into(holder.dataStar);
+//            holder.dataStar.setBackgroundResource(0);
+            holder.dataStar.setWillNotDraw(true);
         }
     }
 

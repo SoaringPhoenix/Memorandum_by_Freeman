@@ -42,9 +42,12 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+
+import solid.ren.skinlibrary.base.SkinBaseActivity;
+
 import static com.example.memorandum.util.CommonUtility.resizeImage;
 
-public class MemorandumActivity extends AppCompatActivity implements GooeyMenu.GooeyMenuInterface, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.GooeyMenuInterface, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private RichEditText richEditText;
     private TextView textView;
     private GooeyMenu gooeyMenu;

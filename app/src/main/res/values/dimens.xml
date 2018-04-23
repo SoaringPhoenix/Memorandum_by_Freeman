@@ -6,6 +6,6 @@
     <dimen name="min_height">140dp</dimen>
     <dimen name="big_circle_radius">30dp</dimen>
     <dimen name="small_circle_radius">20dp</dimen>
-
+    <dimen name="height_top_bar">48dp</dimen>
     <dimen name="min_gap">80dp</dimen>
 </resources>
