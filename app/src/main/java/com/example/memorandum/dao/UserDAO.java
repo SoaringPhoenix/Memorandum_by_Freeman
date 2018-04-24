@@ -1,5 +1,6 @@
 package com.example.memorandum.dao;
 
+import com.example.memorandum.bean.Data;
 import com.example.memorandum.bean.User;
 
 import org.litepal.crud.DataSupport;
@@ -16,7 +17,7 @@ public class UserDAO {
 
 
     public boolean checkUsername(String userName) {
-        userList = DataSupport.select("userName", "password", "nickName").find(User.class);
+        userList = DataSupport.select("userName").find(User.class);
         for (int i = 0; i < userList.size(); i++) {
             User user = userList.get(i);
             if (userName.equals(user.getUserName())) {
@@ -64,4 +65,25 @@ public class UserDAO {
         }
         return false;
     }
+
+    public boolean checkPassword(String userName, String password) {
+        userList = DataSupport.select("userName", "password").where("userName = ?", userName).find(User.class);
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            if (!password.equals(user.getPassword())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void resetPassword(String userName, String password) {
+        userList = DataSupport.select("userName", "password").where("userName = ?", userName).find(User.class);
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            user.setPassword(password);
+            user.updateAll("userName = ?", userName);
+        }
+    }
+
 }

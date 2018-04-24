@@ -23,7 +23,10 @@ public class User extends DataSupport{
     public User() {
 
     }
-
+    public User(String userName, String password) {
+        this.userName = userName;
+        this.password = password;
+    }
     public User(String userName, String password, String nickName) {
         this.userName = userName;
         this.password = password;

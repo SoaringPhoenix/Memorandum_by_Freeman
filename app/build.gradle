@@ -36,5 +36,6 @@ dependencies {
     compile 'com.getbase:floatingactionbutton:1.10.1'
     compile 'com.github.flavienlaurent.datetimepicker:library:0.0.2'
     compile 'com.solid.skin:skinlibrary:2.0.0-beta3'
+    compile 'com.soundcloud.android:android-crop:1.0.1@aar'
     testCompile 'junit:junit:4.12'
 }

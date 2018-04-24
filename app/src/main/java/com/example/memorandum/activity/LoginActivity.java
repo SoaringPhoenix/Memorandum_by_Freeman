@@ -31,7 +31,6 @@ public class LoginActivity extends SkinBaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolkit);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-//        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);   //用户名控件
         mEmailView = (EditText) findViewById(R.id.email);   //用户名控件
 
         mPasswordView = (EditText) findViewById(R.id.password);         //密码控件
@@ -80,7 +79,7 @@ public class LoginActivity extends SkinBaseActivity {
 
         //  检查邮箱
         if ( TextUtils.isEmpty(email) ) {
-            mEmailView.setError("用户名无效");
+            mEmailView.setError("请输入用户名");
             focusView = mEmailView;
             cancel = true;
         }

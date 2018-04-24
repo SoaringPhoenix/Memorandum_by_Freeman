@@ -6,4 +6,5 @@
     <color name="btn_gray_normal">#c0c0c0</color>
     <color name="common_top_bar">#393A3F</color>
     <color name="btn_green_pressed">#6FCD78</color>
+    <color name="icon_press">#68C270</color>
 </resources>
