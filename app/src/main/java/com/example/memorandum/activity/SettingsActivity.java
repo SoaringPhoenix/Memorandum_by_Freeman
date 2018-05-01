@@ -3,19 +3,24 @@ package com.example.memorandum.activity;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.GridView;
 
 import com.example.memorandum.R;
 import com.example.memorandum.bean.Data;
 import com.example.memorandum.ui.DividerItemDecoration;
+import com.example.memorandum.util.AppGlobal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import solid.ren.skinlibrary.base.SkinBaseActivity;
@@ -27,11 +32,6 @@ public class SettingsActivity extends SkinBaseActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         setTitle("设置");
-//        if (Build.VERSION.SDK_INT >= 21) {
-//            View decorView = getWindow().getDecorView();
-//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-//            getWindow().setStatusBarColor(Color.TRANSPARENT);
-//        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolkit);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -51,13 +51,28 @@ public class SettingsActivity extends SkinBaseActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.rl_resetpassword:
-                startActivity(new Intent(SettingsActivity.this, ResetPasswordActivity.class));
+                if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                    startActivity(new Intent(SettingsActivity.this, ResetPasswordActivity.class));
+                }
+                else {
+                    startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
+                }
                 break;
             case R.id.rl_switchtheme:
-                startActivity(new Intent(SettingsActivity.this, ThemeActivity.class));
+                if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                    startActivity(new Intent(SettingsActivity.this, ThemeActivity.class));
+                }
+                else {
+                    startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
+                }
                 break;
             case R.id.rl_exportmemo:
-
+                if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+//                    startActivity(new Intent(SettingsActivity.this, ThemeActivity.class));
+                }
+                else {
+                    startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
+                }
                 break;
 
             default:
@@ -74,4 +89,5 @@ public class SettingsActivity extends SkinBaseActivity implements View.OnClickLi
         }
         return true;
     }
+
 }

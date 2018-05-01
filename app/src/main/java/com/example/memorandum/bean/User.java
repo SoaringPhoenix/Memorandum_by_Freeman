@@ -18,6 +18,7 @@ public class User extends DataSupport{
     private String password;
     @Column(nullable = false)
     private String nickName;
+    private String imagePath;
     private List<Data> dataList = new ArrayList<>();
 
     public User() {
@@ -63,5 +64,21 @@ public class User extends DataSupport{
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public List<Data> getDataList() {
+        return dataList;
+    }
+
+    public void setDataList(List<Data> dataList) {
+        this.dataList = dataList;
     }
 }

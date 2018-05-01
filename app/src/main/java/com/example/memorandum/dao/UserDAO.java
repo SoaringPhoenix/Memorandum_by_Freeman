@@ -86,4 +86,33 @@ public class UserDAO {
         }
     }
 
+    public void updateImagePath(String imagePath, String userName) {
+        User newUser = new User();
+        newUser.setImagePath(imagePath);
+        newUser.updateAll("userName = ?", userName);
+    }
+
+    public static String findImagePath(String userName) {
+        userList = DataSupport.select("userName", "imagePath").find(User.class);
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            if (userName.equals(user.getUserName())) {
+                return user.getImagePath();
+            }
+        }
+        return "";
+    }
+
+    public static User findUser(String userName) {
+        userList = DataSupport.select("userName").find(User.class);
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            if (userName.equals(user.getUserName())) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+
 }

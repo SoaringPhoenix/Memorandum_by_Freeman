@@ -1,5 +1,7 @@
 package com.example.memorandum.activity;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,6 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.example.memorandum.R;
@@ -46,15 +50,16 @@ public class ThemeActivity extends SkinBaseActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+//        int style =
         switch (v.getId()) {
             case R.id.rl_blue:
-                Toast.makeText(ThemeActivity.this, "蓝色主题", Toast.LENGTH_SHORT);
+            Toast.makeText(ThemeActivity.this, "蓝色主题", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.rl_pink:
-                Toast.makeText(ThemeActivity.this, "粉色主题", Toast.LENGTH_SHORT);
+                Toast.makeText(ThemeActivity.this, "粉色主题", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.rl_night:
-                Toast.makeText(ThemeActivity.this, "夜间主题", Toast.LENGTH_SHORT);
+                Toast.makeText(ThemeActivity.this, "夜间主题", Toast.LENGTH_SHORT).show();
 //                Log.d("ThemeActivity", "夜间主题");
                 break;
             default:

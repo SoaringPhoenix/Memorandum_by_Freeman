@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.example.memorandum.R;
 
 import static com.example.memorandum.activity.RegisterActivity.getContext;
+//import static com.example.memorandum.activity.ProfileActivity.getContext;
 
 
 /**

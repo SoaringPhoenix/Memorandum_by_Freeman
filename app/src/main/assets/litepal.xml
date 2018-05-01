@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <litepal>
     <dbname value="Memorandum" ></dbname>
-    <version value="7" ></version>
+    <version value="12" ></version>
 
     <list>
         <mapping class="com.example.memorandum.bean.Data" ></mapping>

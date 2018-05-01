@@ -25,6 +25,7 @@ public class Data extends DataSupport implements Parcelable {
     private int pending;
     @Column(nullable = false)
     private int reminder;
+    private String imagePath;
     private User user;
 
     public Data() {
@@ -52,6 +53,16 @@ public class Data extends DataSupport implements Parcelable {
         this.pending = pending;
         this.reminder = reminder;
         this.star = star;
+    }
+
+    public Data(String date, String content, Date exactTime, int pending, int reminder, int star, User user) {
+        this.date = date;
+        this.content = content;
+        this.exactTime = exactTime;
+        this.pending = pending;
+        this.reminder = reminder;
+        this.star = star;
+        this.user = user;
     }
 
     public int getId() {
@@ -108,6 +119,22 @@ public class Data extends DataSupport implements Parcelable {
 
     public void setReminder(int reminder) {
         this.reminder = reminder;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

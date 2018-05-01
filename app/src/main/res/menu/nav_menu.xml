@@ -22,4 +22,11 @@
         android:icon="@drawable/settings"
         android:title="设置" />
 </group>
+
+<group>
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/logout"
+        android:title="退出登录"/>
+</group>
 </menu>

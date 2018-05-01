@@ -61,6 +61,7 @@
         android:layout_gravity="bottom|right"
         fab:fab_addButtonColorNormal="#18b4Ed"
         fab:fab_addButtonColorPressed="#86e7c2"
+        android:background="@drawable/list_item_bg_white"
         android:layout_margin="16dp"
         android:src="@drawable/add"
         app:elevation="8dp"/>

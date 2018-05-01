@@ -40,7 +40,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
 
     private static final String TAG = "DataAdapter";
     private Handler handler = new Handler() {
-      public void handleMessage(Message message) {
+      public void handleMessage(Message message) { //handler接收并处理消息，根据不同case决定收藏button的样式和文字
           switch (message.what) {
               case favoriteNo:
                   favorite.setText("收藏");
@@ -65,8 +65,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         ImageView dataReminder;
         ImageView dataStar;
         Intent intent = new Intent();
-        public ViewHolder(View view) {
-            super(view);
+        public ViewHolder(View view) {            super(view);
             dataView = view;
             dataDate = (TextView) view.findViewById(R.id.data_date);
             dataContent = (TextView) view.findViewById(R.id.data_content);
@@ -86,24 +85,28 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
-            Data data = mDataList.get(position);
+            int position = getAdapterPosition(); //根据用户点击获取当前位置
+            Data data = mDataList.get(position); //将当前位置传入对应的data对象
             int id = data.getId();
             favorite = (Button) itemView.findViewById(R.id.favorite);
             switch (v.getId()) {
                 case R.id.main:
 //                    Toast.makeText(v.getContext(), "点击了main，位置为：" + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-                    String date = data.getDate();
+                    String date = data.getDate(); //获取当前对象的属性
                     String content = data.getContent();
+                    String imagePath = data.getImagePath();
                     intent.setClass(v.getContext(), MemorandumActivity.class);
-                    intent.putExtra("id", id);
+                    intent.putExtra("id", id); //向intent中传入当前对象的属性的值
                     intent.putExtra("content", content);
                     intent.putExtra("date", date);
                     intent.putExtra("data", data);
+                    if (imagePath != null && !imagePath.equals("")) {
+                        intent.putExtra("imagePath", imagePath);
+                    }
                     v.getContext().startActivity(intent);
                     break;
                 case R.id.favorite:
-                    currentStar = data.getStar();
+                    currentStar = data.getStar();//获取当前对象的star值
                     Message message = new Message();
                     if (currentStar == 2) {
                         data.setStar(1);
@@ -113,7 +116,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
                         favorite.setText("收藏");
                         favorite.setBackgroundResource(R.drawable.btn_mark);
                         Toast.makeText(v.getContext(), "取消收藏", Toast.LENGTH_SHORT).show();
-                        message.what = favoriteNo;
+                        message.what = favoriteNo; //发送favoriteNo的消息
                     }
                     else {
                         data.setStar(2);
@@ -123,9 +126,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
                         favorite.setText("取消收藏");
                         favorite.setBackgroundResource(R.drawable.btn_mark_grey);
                         Toast.makeText(v.getContext(), "已收藏", Toast.LENGTH_SHORT).show();
-                        message.what = favoriteYes;
+                        message.what = favoriteYes;//发送favoriteYes的消息
                     }
-                    handler.sendMessage(message);
+                    handler.sendMessage(message); //使用handler发送消息
                     break;
                 case R.id.delete:
                     DataSupport.delete(Data.class, id);
@@ -198,12 +201,12 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
 
     private void showPending(ViewHolder holder, int currentPending) {
         if (currentPending == 2) {
-            Glide.with(context).load(R.drawable.pending).asBitmap().into(holder.dataPending);
+            Glide.with(context).load(R.drawable.pending).asBitmap().into(holder.dataPending); //使用Glide向imageview中加载图片
         }
         else {
 //            Glide.with(context).load(R.drawable.pending_plain).asBitmap().into(holder.dataPending);
 //           holder.dataPending.setBackgroundResource(0);
-           holder.dataPending.setWillNotDraw(true);
+           holder.dataPending.setWillNotDraw(true); //利用holder找到当前视图位置，设置图片绘制为不绘制
         }
     }
     private void showReminder(ViewHolder holder, int currentReminder) {

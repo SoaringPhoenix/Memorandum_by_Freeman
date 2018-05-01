@@ -36,7 +36,7 @@ public class AlarmService extends Service {
 
     // 添加通知
     public static void addNotification(int delayTime, String tickerText,
-                                       String contentTitle, String contentText, String currentDate, int currentId) {
+                                        String contentTitle, String contentText, String currentDate, int currentId) {
         Intent intent = new Intent(MemorandumActivity.getContext(),
                 AlarmService.class);
         intent.putExtra("delayTime", delayTime);
@@ -45,6 +45,7 @@ public class AlarmService extends Service {
         intent.putExtra("content", contentText);
         intent.putExtra("date", currentDate);
         intent.putExtra("id", currentId);
+//        intent.putExtra("imagePath", currentImagePath);
         MemorandumActivity.getContext().startService(intent);
     }
 
@@ -75,7 +76,9 @@ public class AlarmService extends Service {
                 notificationIntent.putExtra("id", intent.getIntExtra("id", 0));
                 notificationIntent.putExtra("date", intent.getStringExtra("date"));
                 notificationIntent.putExtra("content", intent.getStringExtra("content"));
-                AlarmService.this.startActivity(notificationIntent);
+//                notificationIntent.putExtra("imagePath", intent.getStringExtra("imagePath"));
+                notificationIntent.putExtra("reminder", 1);
+//                AlarmService.this.startActivity(notificationIntent);
                 PendingIntent contentIntent = PendingIntent.getActivity(
                         AlarmService.this, 0, notificationIntent, 0);
 

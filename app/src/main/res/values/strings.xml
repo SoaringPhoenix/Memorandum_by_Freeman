@@ -23,6 +23,26 @@
     <string name="no_permission_camera">未授权的权限</string>
     <string name="my_image_manager">我的相册</string>
     <string name="image_manager">相册</string>
+    <string name="permission_ok">get the permission successfull </string>
+    <string name="permission_error">获取权限失败</string>
+    <string name="not_set">未设置</string>
+    <string name="region">地区</string>
+    <string name="Personal_signature">个性签名</string>
+    <string name="mobile">手机号</string>
+    <string name="send_msg">发送消息</string>
+    <string name="add_to_contacts">添加到通讯录</string>
+    <string name="Head_portrait">头像</string>
+    <string name="yichat_number">ID</string>
+    <string name="me_qrcode">我的身份二维码</string>
+    <string name="sex">性别</string>
+    <string name="memo">备忘录</string>
+    <string name="pending">待办</string>
+    <string name="star">收藏</string>
+    <string name="male">男</string>
+    <string name="female">女</string>
+    <string name="remember_pass">记住密码</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

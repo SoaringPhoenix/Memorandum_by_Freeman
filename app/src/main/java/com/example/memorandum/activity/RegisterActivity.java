@@ -3,13 +3,23 @@ package com.example.memorandum.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +29,7 @@ import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AutoCompleteTextView;
@@ -34,13 +45,18 @@ import com.example.memorandum.R;
 import com.example.memorandum.bean.User;
 import com.example.memorandum.dao.UserDAO;
 import com.example.memorandum.ui.HTAlertDialog;
+import com.example.memorandum.util.AppGlobal;
 import com.example.memorandum.util.CommonUtility;
 import com.example.memorandum.util.RegisterContract;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.UUID;
 
 import solid.ren.skinlibrary.base.SkinBaseActivity;
+
 
 public class RegisterActivity extends SkinBaseActivity implements View.OnClickListener {
 //    private AutoCompleteTextView mEmailView;  //用户名
@@ -52,12 +68,14 @@ public class RegisterActivity extends SkinBaseActivity implements View.OnClickLi
     private Button mEmailSignInButton, codeButton;
     private ImageView iv_show, iv_hide, iv_show_re, iv_hide_re;
     private ImageView iv_photo;
-    private String imagePathOrigin = null;
     private static final int REQUEST_CODE=100;
-    private Activity activity = null;
+    private Activity activity = this;
     private String title;
     private String[] items;
     private static Context sContext = null;
+    private Uri head_imageUri;
+    public static final int TAKE_PHOTO = 1;
+    public  static final int CHOOSE_PHOTO = 2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +105,7 @@ public class RegisterActivity extends SkinBaseActivity implements View.OnClickLi
         iv_hide.setOnClickListener(this);
         iv_hide_re.setOnClickListener(this);
         iv_photo.setOnClickListener(this);
-        activity = this;
+
         sContext = this;
     }
     public static Context getContext() {
@@ -251,6 +269,9 @@ public class RegisterActivity extends SkinBaseActivity implements View.OnClickLi
             else{
                 isSucess= userDAO.insert(user); //添加到数据库
                 if (isSucess){  //合法信息
+                    if (AppGlobal.INSERT_IMAGE) {
+                        userDAO.updateImagePath(AppGlobal.currentImagePath, email);
+                    }
                     Toast.makeText(RegisterActivity.this, "注册成功，请登录", Toast.LENGTH_SHORT).show();
                     Intent intent=new Intent();
                     intent.setClass(RegisterActivity.this,LoginActivity.class);//转到登陆
@@ -259,6 +280,7 @@ public class RegisterActivity extends SkinBaseActivity implements View.OnClickLi
                 else {
                     Toast.makeText(RegisterActivity.this, "信息不合法，请确认输入", Toast.LENGTH_SHORT).show();
                 }
+
             }
         }
     }
@@ -274,47 +296,160 @@ public class RegisterActivity extends SkinBaseActivity implements View.OnClickLi
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(int position) {
-                imagePathOrigin = getAvatarName();
                 switch (position) {
                     case 0:
-                        if(!checkPermission(Manifest.permission.CAMERA)){
-                            return;
+                        File outputImage = new File(getExternalCacheDir(), UUID.randomUUID().toString() + ".jpg");
+                        String outputImagePath = outputImage.getAbsolutePath();
+                        AppGlobal.currentImagePath = outputImagePath;
+//                        Log.d("RegisterActivity", outputImagePath);
+//                        Toast.makeText(RegisterActivity.this, outputImagePath, Toast.LENGTH_SHORT).show();
+                        try {
+                            if (outputImage.exists()) {
+                                outputImage.delete();
+                            }
+                            outputImage.createNewFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        // 指定调用相机拍照后照片的储存路径
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                                Uri.fromFile(new File(imagePathOrigin)));
-                        getActivity().startActivityForResult(intent, RegisterContract.PHOTO_REQUEST_TAKEPHOTO);
+                        if (Build.VERSION.SDK_INT >= 24) {
+                            head_imageUri = FileProvider.getUriForFile(RegisterActivity.this, "com.exmaple.memorandum.fileprovider", outputImage);
+                        }
+                        else {
+                            head_imageUri = Uri.fromFile(outputImage);
+                        }
+                        openCamera();
                         break;
+//
                     case 1:
-                        if( !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) ){
-                            return;
+                        if (ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(RegisterActivity.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                        } else {
+                            openAlbum();
                         }
-
-                        Crop.pickImage(getActivity(), RegisterContract.PHOTO_REQUEST_GALLERY);
                         break;
+//
                 }
             }
         });
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private boolean checkPermission(String permissionName) {
-        PackageManager pm = getApplicationContext().getPackageManager();
-        boolean permission = (PackageManager.PERMISSION_GRANTED ==
-                pm.checkPermission(permissionName,  getApplicationContext().getPackageName()));
-        if (permission) {
-            return true;
-        }else {
-            Toast.makeText(RegisterActivity.this, getString(R.string.no_permission_camera), Toast.LENGTH_SHORT).show();
-            requestPermissions(new String[]{permissionName},
-                    REQUEST_CODE);
-            return false;
-
+    private void openCamera() {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, head_imageUri);
+        startActivityForResult(intent, TAKE_PHOTO);
+    }
+    private void openAlbum() {
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+        intent.setType("image/*");
+        startActivityForResult(intent, CHOOSE_PHOTO);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openAlbum();
+                    openCamera();
+                } else {
+                    Toast.makeText(this, "You denied the permission", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
         }
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case TAKE_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    try {
+                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(head_imageUri));
+                        iv_photo.setImageBitmap(bitmap);
+                        AppGlobal.INSERT_IMAGE = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case CHOOSE_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    if (Build.VERSION.SDK_INT >= 19) {
+                        handleImageOnKitKat(data);
+                    } else {
+                        handleImageBeforeKitKat(data);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    private void handleImageBeforeKitKat(Intent data) {
+        Uri uri = data.getData();
+        String imagePath = getImagePath(uri, null);
+        displayImage(imagePath);
+    }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void handleImageOnKitKat(Intent data) {
+        String imagePath = null;
+        Uri uri = data.getData();
+        if (DocumentsContract.isDocumentUri(this, uri)) {
+            String docId = DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
+                String id = docId.split(":")[1];
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+            } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://download/public_downloads"), Long.valueOf(docId));
+                imagePath = getImagePath(contentUri, null);
+            }
+            else if ("content".equalsIgnoreCase(uri.getScheme())) {
+                imagePath = getImagePath(uri, null);
+            }
+            else if ("file".equalsIgnoreCase(uri.getScheme())) {
+                imagePath = uri.getPath();
+            }
+            displayImage(imagePath);
+        }
+    }
+    private void displayImage(String imagePath) {
+        if (imagePath != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+//            Log.d("RegisterActivity", imagePath);
+            File albumImage = new File(getExternalCacheDir(), UUID.randomUUID().toString() + ".jpg");
+            String albumImagePath = albumImage.getAbsolutePath();
+            AppGlobal.currentImagePath = albumImagePath;
+//            Log.d("RegisterActivity", albumImagePath);
+            Toast.makeText(this, albumImagePath, Toast.LENGTH_SHORT).show();
+            try {
+                if (albumImage.exists()) {
+                    albumImage.delete();
+                }
+                FileOutputStream out;
+                out = new FileOutputStream(albumImage);
+                if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+                    out.flush();
+                    out.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            iv_photo.setImageBitmap(bitmap);
+            AppGlobal.INSERT_IMAGE = true;
+        } else {
+            Toast.makeText(this, "failed to get image", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private String getImagePath(Uri uri, String selection) {
+        String path = null;
+        Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
+    }
 
     /**
      * 密码是否和非法，至少需要4位

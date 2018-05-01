@@ -2,8 +2,12 @@ package com.example.memorandum.activity;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -23,14 +27,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.memorandum.R;
 import com.example.memorandum.adapter.DataAdapter;
 import com.example.memorandum.bean.Data;
+import com.example.memorandum.bean.User;
 import com.example.memorandum.dao.DataDAO;
+import com.example.memorandum.dao.UserDAO;
 import com.example.memorandum.ui.DividerItemDecoration;
 import com.example.memorandum.ui.SwipeItemLayout;
+import com.example.memorandum.util.AppGlobal;
+
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 import java.util.ArrayList;
@@ -47,6 +57,7 @@ public class MainActivity extends SkinBaseActivity {
     private SearchView searchView;
     private static final String TAG = "MainActivity";
     private DataDAO dataDAO = new DataDAO();
+    private UserDAO userDAO = new UserDAO();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +74,16 @@ public class MainActivity extends SkinBaseActivity {
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.inflateHeaderView(R.layout.nav_header);
         CircleImageView headerImage = (CircleImageView) headerView.findViewById(R.id.icon_image);
+        TextView signIn = (TextView) headerView.findViewById(R.id.sign_in);
+        TextView signComment = (TextView) headerView.findViewById(R.id.sign_comment);
+        if (!AppGlobal.USERNAME.equals("")) {
+            String currentImagePath = userDAO.findImagePath(AppGlobal.USERNAME);
+            Glide.with(this).load(currentImagePath).asBitmap().into(headerImage);
+//            Bitmap bitmap = BitmapFactory.decodeFile(getExternalCacheDir()+"/head_image.jpg");
+//            headerImage.setImageBitmap(bitmap);
+            signIn.setText(AppGlobal.NAME);
+            signComment.setText("欢迎您登录本应用");
+        }
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -71,16 +92,24 @@ public class MainActivity extends SkinBaseActivity {
         headerImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(v.getContext(), "You clicked header", Toast.LENGTH_SHORT);
-                Intent intent = new Intent(MainActivity.this , LoginActivity.class);
-                startActivity(intent);
+                Toast.makeText(v.getContext(), "You clicked header", Toast.LENGTH_SHORT);
+                if (!AppGlobal.USERNAME.equals("")) {
+                    String currentImagePath = userDAO.findImagePath(AppGlobal.USERNAME);
+                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    intent.putExtra("imagePath", currentImagePath);
+                    startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
             }
         });
         navigationView.setCheckedItem(R.id.nav_memo);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                mDrawerLayout.closeDrawers();
+                mDrawerLayout.closeDrawers(); //关闭菜单
                 switch (item.getItemId()) {
                     case R.id.nav_memo:
                         initMemo();
@@ -102,6 +131,16 @@ public class MainActivity extends SkinBaseActivity {
                         Intent intent = new Intent(MainActivity.this , SettingsActivity.class);
                         startActivity(intent);
                         break;
+                    case R.id.nav_logout:
+                        if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                            finish();
+                            AppGlobal.USERNAME = "";
+                            AppGlobal.NAME = "";
+                            AppGlobal.INSERT_IMAGE = false;
+                            AppGlobal.currentImagePath = "";
+                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        }
+                        break;
                 }
                 return true;
 
@@ -112,7 +151,7 @@ public class MainActivity extends SkinBaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MemorandumActivity.class);
+                Intent intent = new Intent(MainActivity.this, MemorandumActivity.class); //利用Intent跳转到空的memorandumActivty.class
                 v.getContext().startActivity(intent);
             }
         });
@@ -137,34 +176,68 @@ public class MainActivity extends SkinBaseActivity {
                 final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
                 LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
                 recyclerView.setLayoutManager(layoutManager);
-                if (!TextUtils.isEmpty(newText)) {
-                    dataList.clear();
-                    if (getTitle() == "备忘录") {
-                        dataList = dataDAO.queryData(newText);
-                    }
-                    else if (getTitle() == "待办") {
-                        dataList = dataDAO.queryPending(newText);
-                    }
-                    else if (getTitle() == "提醒") {
-                        dataList = dataDAO.queryReminder(newText);
-                    }
-                    else if (getTitle() == "收藏") {
-                        dataList = dataDAO.queryFavorites(newText);
-                    }
-                } else {
-                    if (getTitle() == "待办") {
-                        dataList = dataDAO.getPending();
-                    }
-                    else if (getTitle() == "提醒") {
-                        dataList = dataDAO.getReminder();
-                    }
-                    else if (getTitle() == "收藏") {
-                        dataList = dataDAO.getFavorites();
-                    }
-                    else {
-                        dataList = dataDAO.getData();
+                if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                    User currentUser = userDAO.findUser(AppGlobal.USERNAME);
+                    if (!TextUtils.isEmpty(newText.trim())) { //判定searchview的输入框是否非空
+                        dataList.clear();
+                        if (getTitle() == "备忘录") {
+                            dataList = dataDAO.queryData(newText.trim());
+                        }
+                        else if (getTitle() == "待办") {
+                            dataList = dataDAO.queryPending(newText.trim());
+                        }
+                        else if (getTitle() == "提醒") {
+                            dataList = dataDAO.queryReminder(newText.trim());
+                        }
+                        else if (getTitle() == "收藏") {
+                            dataList = dataDAO.queryFavorites(newText.trim());
+                        }
+                    } else {
+                        if (getTitle() == "待办") {
+                            dataList = dataDAO.getPending();
+                        }
+                        else if (getTitle() == "提醒") {
+                            dataList = dataDAO.getReminder();
+                        }
+                        else if (getTitle() == "收藏") {
+                            dataList = dataDAO.getFavorites();
+                        }
+                        else {
+                            dataList = dataDAO.getData();
+                        }
                     }
                 }
+                else {
+                    if (!TextUtils.isEmpty(newText)) {
+                        dataList.clear();
+                        if (getTitle() == "备忘录") {
+                            dataList = dataDAO.queryData(newText.trim());
+                        }
+                        else if (getTitle() == "待办") {
+                            dataList = dataDAO.queryPending(newText.trim());
+                        }
+                        else if (getTitle() == "提醒") {
+                            dataList = dataDAO.queryReminder(newText.trim());
+                        }
+                        else if (getTitle() == "收藏") {
+                            dataList = dataDAO.queryFavorites(newText.trim());
+                        }
+                    } else {
+                        if (getTitle() == "待办") {
+                            dataList = dataDAO.getPending();
+                        }
+                        else if (getTitle() == "提醒") {
+                            dataList = dataDAO.getReminder();
+                        }
+                        else if (getTitle() == "收藏") {
+                            dataList = dataDAO.getFavorites();
+                        }
+                        else {
+                            dataList = dataDAO.getData();
+                        }
+                    }
+                }
+
                 adapter = new DataAdapter(dataList);
                 recyclerView.setAdapter(adapter);
                 return false;
@@ -179,6 +252,7 @@ public class MainActivity extends SkinBaseActivity {
             }
         });
     }
+
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolkit, menu);
@@ -202,6 +276,20 @@ public class MainActivity extends SkinBaseActivity {
         searchView.setFocusable(false);
         searchView.setFocusableInTouchMode(false);
         searchView.requestFocus();
+//        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        View headerView = navigationView.inflateHeaderView(R.layout.nav_header);
+//        TextView signIn = (TextView) headerView.findViewById(R.id.sign_in);
+//        TextView signComment = (TextView) headerView.findViewById(R.id.sign_comment);
+//        CircleImageView headerImage = (CircleImageView) headerView.findViewById(R.id.icon_image);
+//        if (!AppGlobal.USERNAME.equals("")) {
+//            String currentImagePath = userDAO.findImagePath(AppGlobal.USERNAME);
+//            Glide.with(this).load(currentImagePath).asBitmap().into(headerImage);
+////            Bitmap bitmap = BitmapFactory.decodeFile(getExternalCacheDir()+"/head_image.jpg");
+////            headerImage.setImageBitmap(bitmap);
+//            signIn.setText(AppGlobal.NAME);
+//            signComment.setText("欢迎您登录本应用");
+//        }
+
     }
 
     private void initMemo() {

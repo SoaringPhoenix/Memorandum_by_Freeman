@@ -3,6 +3,7 @@ package com.example.memorandum.dao;
 import android.database.Cursor;
 
 import com.example.memorandum.bean.Data;
+import com.example.memorandum.bean.User;
 
 import org.litepal.crud.DataSupport;
 
@@ -26,6 +27,11 @@ public class DataDAO {
         dataList = DataSupport.where("pending = ?", "2").order("exactTime desc").find(Data.class);
         return dataList;
     }
+
+//    public List<Data> getUserPending(User user) {
+//        dataList = DataSupport.where("pending = ?, user = ?", "2", user).order("exactTime desc").find(Data.class);
+//        return dataList;
+//    }
 
     public List<Data> getReminder() {
         dataList = DataSupport.where("reminder = ?", "2").order("exactTime desc").find(Data.class);
@@ -77,15 +83,28 @@ public class DataDAO {
     }
 
     public void insertData(Data data) {
-            dataList.add(data);
-            Data newData = new Data();
-            newData.setDate(data.getDate());
-            newData.setContent(data.getContent());
-            newData.setExactTime(data.getExactTime());
-            newData.setPending(data.getPending());
-            newData.setReminder(data.getReminder());
-            newData.setStar(data.getStar());
-            newData.save();
+        dataList.add(data);
+        Data newData = new Data();
+        newData.setDate(data.getDate());
+        newData.setContent(data.getContent());
+        newData.setExactTime(data.getExactTime());
+        newData.setPending(data.getPending());
+        newData.setReminder(data.getReminder());
+        newData.setStar(data.getStar());
+        newData.save();
+    }
+
+    public void insertUserData(Data data) {
+        dataList.add(data);
+        Data newData = new Data();
+        newData.setDate(data.getDate());
+        newData.setContent(data.getContent());
+        newData.setExactTime(data.getExactTime());
+        newData.setPending(data.getPending());
+        newData.setReminder(data.getReminder());
+        newData.setStar(data.getStar());
+        newData.setUser(data.getUser());
+        newData.save();
     }
 
     public void updateData(Data data, int currentId) {
@@ -99,8 +118,25 @@ public class DataDAO {
         newData.update(currentId);
     }
 
+    public void updateUserData(Data data, int currentId) {
+        Data newData = new Data();
+        newData.setDate(data.getDate());
+        newData.setContent(data.getContent());
+        newData.setExactTime(data.getExactTime());
+        newData.setPending(data.getPending());
+        newData.setReminder(data.getReminder());
+        newData.setStar(data.getStar());
+        newData.setUser(data.getUser());
+        newData.update(currentId);
+    }
+
     public void deleteData(int currentId) {
         DataSupport.delete(Data.class, currentId);
     }
 
+    public void updateImagePath(String imagePath, int currentId) {
+        Data newData = new Data();
+        newData.setImagePath(imagePath);
+        newData.update(currentId);
+    }
 }

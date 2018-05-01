@@ -19,9 +19,13 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="5dp"
         android:id="@+id/exact_time" />
     <com.example.memorandum.ui.RichEditText
         android:id="@+id/input"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="20"
@@ -29,11 +33,18 @@
         android:background="@null"
         android:paddingTop="0dp"/>
 
+    <RelativeLayout android:id="@+id/checkboxlayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="4">
+
+    </RelativeLayout>
 
     <com.example.memorandum.ui.GooeyMenu
         android:id="@+id/gooey_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         app:fab_radius="@dimen/big_circle_radius"
         app:gap_between_menu_fab="@dimen/min_gap"
         app:menu_radius="@dimen/small_circle_radius"
