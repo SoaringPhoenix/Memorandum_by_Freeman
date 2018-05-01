@@ -69,6 +69,7 @@ public class MainActivity extends SkinBaseActivity {
         setContentView(R.layout.activity_main);
         LitePal.getDatabase();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolkit);
+        setTitle("备忘录");
         setSupportActionBar(toolbar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);

@@ -172,8 +172,12 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        if (data.getContent().length() <= 20) {
-        holder.dataContent.setText(data.getContent());
+        if (data.getContent().length() <= 40) {
+            holder.dataContent.setText(data.getContent());
+        }
+        else {
+            holder.dataContent.setText(data.getContent().substring(0, 40) + "...");
+        }
         showPending(holder, data.getPending());
         showReminder(holder, data.getReminder());
         showStar(holder, data.getStar());

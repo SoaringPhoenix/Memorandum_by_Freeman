@@ -66,6 +66,18 @@ public class DataDAO {
         return dataList;
     }
 
+    public static int findCurrentId() {
+        dataList = DataSupport.select("id").order("exactTime desc").find(Data.class);
+        Data data = dataList.get(0);
+        int currentId = data.getId();
+        return currentId;
+    }
+    public static Data findCurrentData() {
+        dataList = DataSupport.order("exactTime desc").find(Data.class);
+        Data data = dataList.get(0);
+        return data;
+    }
+
     public static List<Data> getRawData(String... sql) {
         Cursor cursor = DataSupport.findBySQL(sql);
         if (cursor.moveToFirst()) {
