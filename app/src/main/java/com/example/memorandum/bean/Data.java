@@ -15,18 +15,18 @@ import java.util.Date;
 
 public class Data extends DataSupport implements Parcelable {
     private int id;
-    private String date;
+    private String date; //备忘录中标识的日期
     @Column(nullable = false)
-    private String content;
-    private Date exactTime;
+    private String content; //备忘录文字内容
+    private Date exactTime; //用以对备忘录以时间排序
     @Column(nullable = false)
-    private int star;
+    private int star; //标识备忘录是否被收藏，初始0，非为1，是为2
     @Column(nullable = false)
-    private int pending;
+    private int pending; //标识备忘录是否待办，初始0，非为1，是为2
     @Column(nullable = false)
-    private int reminder;
-    private String imagePath;
-    private User user;
+    private int reminder; //标识备忘录是否提醒，初始0，非为1，是为2
+    private String imagePath; //存储备忘录中图片的绝对路径
+    private User user; //user外键，表结构中为user_id
 
     public Data() {
 

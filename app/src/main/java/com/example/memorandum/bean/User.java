@@ -13,13 +13,13 @@ import java.util.List;
 public class User extends DataSupport{
     private int id;
     @Column(nullable = false)
-    private String userName;
+    private String userName; //用户名，用来唯一标识用户的token
     @Column(nullable = false)
-    private String password;
+    private String password; //用户密码，最少4位
     @Column(nullable = false)
-    private String nickName;
-    private String imagePath;
-    private List<Data> dataList = new ArrayList<>();
+    private String nickName; //用户昵称，可在app中修改，可重复
+    private String imagePath; //用户头像的图片绝对路径
+    private List<Data> dataList = new ArrayList<>(); //用户的对应一个或多个data项的外键集合
 
     public User() {
 
