@@ -58,6 +58,11 @@ public class MainActivity extends SkinBaseActivity {
     private static final String TAG = "MainActivity";
     private DataDAO dataDAO = new DataDAO();
     private UserDAO userDAO = new UserDAO();
+    private TextView signIn;
+    private TextView signComment;
+    NavigationView navigationView;
+    View headerView;
+    CircleImageView headerImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,11 +77,11 @@ public class MainActivity extends SkinBaseActivity {
         setTitle("备忘录");
         setSupportActionBar(toolbar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View headerView = navigationView.inflateHeaderView(R.layout.nav_header);
-        CircleImageView headerImage = (CircleImageView) headerView.findViewById(R.id.icon_image);
-        TextView signIn = (TextView) headerView.findViewById(R.id.sign_in);
-        TextView signComment = (TextView) headerView.findViewById(R.id.sign_comment);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        headerView = navigationView.inflateHeaderView(R.layout.nav_header);
+        headerImage = (CircleImageView) headerView.findViewById(R.id.icon_image);
+        signIn = (TextView) headerView.findViewById(R.id.sign_in);
+        signComment = (TextView) headerView.findViewById(R.id.sign_comment);
         if (!AppGlobal.USERNAME.equals("")) {
             String currentImagePath = userDAO.findImagePath(AppGlobal.USERNAME);
             Glide.with(this).load(currentImagePath).asBitmap().into(headerImage);
@@ -113,24 +118,53 @@ public class MainActivity extends SkinBaseActivity {
                 mDrawerLayout.closeDrawers(); //关闭菜单
                 switch (item.getItemId()) {
                     case R.id.nav_memo:
-                        initMemo();
+                        if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                            int userId = userDAO.findUserId(AppGlobal.USERNAME);
+                            initUserMemo(userId);
+                        }
+                        else {
+                            initMemo();
+                        }
                         setTitle("备忘录");
                         break;
                     case R.id.nav_pending:
-                        initPending();
+                        if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                            int userId = userDAO.findUserId(AppGlobal.USERNAME);
+                            initUserPending(userId);
+                        }
+                        else {
+                            initPending();
+                        }
                         setTitle("待办");
                         break;
                     case R.id.nav_reminder:
-                        initReminder();
+                        if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                            int userId = userDAO.findUserId(AppGlobal.USERNAME);
+                            initUserReminder(userId);
+                        }
+                        else {
+                            initReminder();
+                        }
                         setTitle("提醒");
                         break;
                     case R.id.nav_favorites:
-                        initFavorites();
+                        if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                            int userId = userDAO.findUserId(AppGlobal.USERNAME);
+                            initUserFavorites(userId);
+                        }
+                        else {
+                            initFavorites();
+                        }
                         setTitle("收藏");
                         break;
                     case R.id.nav_settings:
-                        Intent intent = new Intent(MainActivity.this , SettingsActivity.class);
-                        startActivity(intent);
+                        if (AppGlobal.NAME != null && !AppGlobal.NAME.equals("")) {
+                            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                            startActivity(intent);
+                        }
+                        else {
+                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        }
                         break;
                     case R.id.nav_logout:
                         if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
@@ -139,7 +173,6 @@ public class MainActivity extends SkinBaseActivity {
                             AppGlobal.NAME = "";
                             AppGlobal.INSERT_IMAGE = false;
                             AppGlobal.currentImagePath = "";
-                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         }
                         break;
                 }
@@ -157,7 +190,13 @@ public class MainActivity extends SkinBaseActivity {
             }
         });
         searchView = (SearchView) findViewById(R.id.search_view);
-        dataList = dataDAO.getData();
+        if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+            int userId = userDAO.findUserId(AppGlobal.USERNAME);
+            dataList = dataDAO.getUserData(userId);
+        }
+        else {
+            dataList = dataDAO.getData();
+        }
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -179,32 +218,36 @@ public class MainActivity extends SkinBaseActivity {
                 recyclerView.setLayoutManager(layoutManager);
                 if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
                     User currentUser = userDAO.findUser(AppGlobal.USERNAME);
+                    int userId = userDAO.findUserId(AppGlobal.USERNAME);
+                    Log.i(TAG, Integer.toString(userId));
                     if (!TextUtils.isEmpty(newText.trim())) { //判定searchview的输入框是否非空
                         dataList.clear();
                         if (getTitle() == "备忘录") {
-                            dataList = dataDAO.queryData(newText.trim());
+                            dataList = dataDAO.queryUserData(newText.trim(), userId);
                         }
                         else if (getTitle() == "待办") {
-                            dataList = dataDAO.queryPending(newText.trim());
+                            dataList = dataDAO.queryUserPending(newText.trim(), userId);
                         }
                         else if (getTitle() == "提醒") {
-                            dataList = dataDAO.queryReminder(newText.trim());
+                            dataList = dataDAO.queryUserReminder(newText.trim(), userId);
                         }
                         else if (getTitle() == "收藏") {
-                            dataList = dataDAO.queryFavorites(newText.trim());
+                            dataList = dataDAO.queryUserFavorites(newText.trim(), userId);
                         }
-                    } else {
+                    }
+                    else { // searchview输入为空
+                        dataList.clear();
                         if (getTitle() == "待办") {
-                            dataList = dataDAO.getPending();
+                            dataList = dataDAO.getUserPending(userId);
                         }
                         else if (getTitle() == "提醒") {
-                            dataList = dataDAO.getReminder();
+                            dataList = dataDAO.getUserReminder(userId);
                         }
                         else if (getTitle() == "收藏") {
-                            dataList = dataDAO.getFavorites();
+                            dataList = dataDAO.getUserFavorites(userId);
                         }
                         else {
-                            dataList = dataDAO.getData();
+                            dataList = dataDAO.getUserData(userId);
                         }
                     }
                 }
@@ -277,6 +320,12 @@ public class MainActivity extends SkinBaseActivity {
         searchView.setFocusable(false);
         searchView.setFocusableInTouchMode(false);
         searchView.requestFocus();
+        if (AppGlobal.NAME != null && !AppGlobal.NAME.equals("")) {
+            signIn.setText(AppGlobal.NAME);
+        }
+        if (AppGlobal.currentImagePath != null && ! AppGlobal.currentImagePath.equals("")) {
+            Glide.with(this).load(AppGlobal.currentImagePath).asBitmap().into(headerImage);
+        }
 //        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 //        View headerView = navigationView.inflateHeaderView(R.layout.nav_header);
 //        TextView signIn = (TextView) headerView.findViewById(R.id.sign_in);
@@ -294,25 +343,46 @@ public class MainActivity extends SkinBaseActivity {
     }
 
     private void initMemo() {
+        dataList.clear();
         dataList = dataDAO.getData();
         initRecyclerView();
     }
-
+    private void initUserMemo(int userId) {
+        dataList.clear();
+        dataList = dataDAO.getUserData(userId);
+        initRecyclerView();
+    }
     private void initPending() {
+        dataList.clear();
         dataList = dataDAO.getPending();
+        initRecyclerView();
+    }
+    private void initUserPending(int userId) {
+        dataList.clear();
+        dataList = dataDAO.getUserPending(userId);
         initRecyclerView();
     }
 
     private void initReminder() {
+        dataList.clear();
         dataList = dataDAO.getReminder();
         initRecyclerView();
     }
-
+    private void initUserReminder(int userId) {
+        dataList.clear();
+        dataList = dataDAO.getUserReminder(userId);
+        initRecyclerView();
+    }
     private void initFavorites() {
+        dataList.clear();
         dataList = dataDAO.getFavorites();
         initRecyclerView();
     }
-
+    private void initUserFavorites(int userId) {
+        dataList.clear();
+        dataList = dataDAO.getUserFavorites(userId);
+        initRecyclerView();
+    }
     private void initRecyclerView() {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -350,14 +420,29 @@ public class MainActivity extends SkinBaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (getTitle() == "待办") {
-                            initPending();
-                        } else if (getTitle() == "提醒") {
-                            initReminder();
-                        } else if (getTitle() == "收藏") {
-                            initFavorites();
-                        } else {
-                            initMemo();
+                        dataList.clear();
+                        if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
+                            int userId = userDAO.findUserId(AppGlobal.USERNAME);
+                            if (getTitle() == "待办") {
+                                initUserPending(userId);
+                            } else if (getTitle() == "提醒") {
+                                initUserReminder(userId);
+                            } else if (getTitle() == "收藏") {
+                                initUserFavorites(userId);
+                            } else {
+                                initUserMemo(userId);
+                            }
+                        }
+                        else {
+                            if (getTitle() == "待办") {
+                                initPending();
+                            } else if (getTitle() == "提醒") {
+                                initReminder();
+                            } else if (getTitle() == "收藏") {
+                                initFavorites();
+                            } else {
+                                initMemo();
+                            }
                         }
                         swipeRefresh.setRefreshing(false);
                     }

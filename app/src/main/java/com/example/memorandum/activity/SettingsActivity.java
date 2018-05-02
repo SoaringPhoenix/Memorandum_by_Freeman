@@ -51,28 +51,12 @@ public class SettingsActivity extends SkinBaseActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.rl_resetpassword:
-                if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
                     startActivity(new Intent(SettingsActivity.this, ResetPasswordActivity.class));
-                }
-                else {
-                    startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
-                }
                 break;
             case R.id.rl_switchtheme:
-                if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
                     startActivity(new Intent(SettingsActivity.this, ThemeActivity.class));
-                }
-                else {
-                    startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
-                }
                 break;
             case R.id.rl_exportmemo:
-                if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
-//                    startActivity(new Intent(SettingsActivity.this, ThemeActivity.class));
-                }
-                else {
-                    startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
-                }
                 break;
 
             default:

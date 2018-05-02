@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +28,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,6 +36,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.memorandum.R;
+import com.example.memorandum.dao.DataDAO;
 import com.example.memorandum.dao.UserDAO;
 import com.example.memorandum.ui.HTAlertDialog;
 import com.example.memorandum.util.AppGlobal;
@@ -49,7 +53,7 @@ public class ProfileActivity extends RegisterActivity implements View.OnClickLis
     private TextView tv_name;
 //    private TextView tv_fxid;
     private TextView tv_memo, tv_pending, tv_star;
-    private TextView memo_num, pending_num, star_num;
+    private TextView memo_num, pending_num, reminder_num, star_num, image_num;
     private String sex;
     public static final int TAKE_PHOTO = 1;
     public  static final int CHOOSE_PHOTO = 2;
@@ -57,6 +61,7 @@ public class ProfileActivity extends RegisterActivity implements View.OnClickLis
     private Activity activity = this;
     private static Context sContext = null;
     UserDAO userDAO = new UserDAO();
+    DataDAO dataDAO = new DataDAO();
     Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +83,9 @@ public class ProfileActivity extends RegisterActivity implements View.OnClickLis
         tv_pending = (TextView) findViewById(R.id.tv_pending);
         memo_num = (TextView) findViewById(R.id.memo_num);
         pending_num = (TextView) findViewById(R.id.pending_num);
+        reminder_num = (TextView) findViewById(R.id.reminder_num);
         star_num = (TextView) findViewById(R.id.star_num);
+        image_num  = (TextView) findViewById(R.id.image_num);
         if (AppGlobal.NAME != null && !AppGlobal.NAME.equals("")) {
             tv_name.setText(AppGlobal.NAME);
         }
@@ -102,6 +109,17 @@ public class ProfileActivity extends RegisterActivity implements View.OnClickLis
         re_qrcode.setOnClickListener(this);
 
         sContext = this;
+        int userId = userDAO.findUserId(AppGlobal.USERNAME);
+        int memoCount = dataDAO.memoCount(userId);
+        int pendingCount = dataDAO.pendingCount(userId);
+        int reminderCount = dataDAO.reminderCount(userId);
+        int favoriteCount = dataDAO.favoriteCount(userId);
+        int imageCount = dataDAO.imageCount(userId);
+        memo_num.setText(Integer.toString(memoCount));
+        pending_num.setText(Integer.toString(pendingCount));
+        reminder_num.setText(Integer.toString(reminderCount));
+        star_num.setText(Integer.toString(favoriteCount));
+        image_num.setText(Integer.toString(imageCount));
     }
 
     @Override
@@ -111,9 +129,31 @@ public class ProfileActivity extends RegisterActivity implements View.OnClickLis
                 showCamera();
                 break;
             case R.id.re_name:
-//                startActivity(new Intent(getActivity(), ProfileUpdateActivity.class)
-//                        .putExtra("type", ProfileUpdateActivity.TYPE_NICK)
-//                        .putExtra("default", userJson.getString(HTConstant.JSON_KEY_NICK)));
+
+                final EditText et = new EditText(this);
+                et.setText(AppGlobal.NAME);
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
+                        .setTitle("请修改昵称")
+//      .setIcon(android.R.drawable.ic_dialog_info)
+                        .setView(et)
+                        .setCancelable(false)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                String input = et.getText().toString();
+                                if (input.equals("")) {
+                                    Toast.makeText(getApplicationContext(), "用户昵称不能为空" + input, Toast.LENGTH_LONG).show();
+                                }
+                                else {
+                                    userDAO.resetNickname(AppGlobal.USERNAME, input);
+                                    AppGlobal.NAME = input;
+                                    tv_name.setText(AppGlobal.NAME);
+                                }
+                            }
+                        })
+                        .setNegativeButton("取消", null).create();
+//                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setLeft(0);
+                alertDialog.show();
+
                 break;
 //            case R.id.re_fxid:
 //                if (TextUtils.isEmpty(userJson.getString(HTConstant.JSON_KEY_FXID))) {

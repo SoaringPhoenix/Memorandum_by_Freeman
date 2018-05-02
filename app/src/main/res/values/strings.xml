@@ -37,6 +37,8 @@
     <string name="sex">性别</string>
     <string name="memo">备忘录</string>
     <string name="pending">待办</string>
+    <string name="reminder">提醒</string>
+    <string name="image">图片</string>
     <string name="star">收藏</string>
     <string name="male">男</string>
     <string name="female">女</string>

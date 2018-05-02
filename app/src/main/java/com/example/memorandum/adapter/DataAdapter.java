@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.example.memorandum.activity.MemorandumActivity;
 import com.example.memorandum.R;
 import com.example.memorandum.bean.Data;
+import com.example.memorandum.dao.DataDAO;
 
 import org.litepal.crud.DataSupport;
 
@@ -37,6 +38,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
     int currentStar;
     public static final int favoriteNo = 1;
     public static final int favoriteYes = 2;
+    DataDAO dataDAO = new DataDAO();
 
     private static final String TAG = "DataAdapter";
     private Handler handler = new Handler() {
@@ -161,6 +163,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Data data = mDataList.get(position);
+        int currentId = data.getId();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
         Date date = new Date(System.currentTimeMillis());
         try {
@@ -172,12 +175,16 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder>  {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (data.getContent().length() <= 40) {
-            holder.dataContent.setText(data.getContent());
+        if (data.getContent() != null) {
+            if (data.getContent().length() <= 40) {
+                holder.dataContent.setText(data.getContent());
+            } else {
+                holder.dataContent.setText(data.getContent().substring(0, 40) + "...");
+            }
         }
-        else {
-            holder.dataContent.setText(data.getContent().substring(0, 40) + "...");
-        }
+//        else {
+//            dataDAO.deleteData(currentId);
+//        }
         showPending(holder, data.getPending());
         showReminder(holder, data.getReminder());
         showStar(holder, data.getStar());

@@ -54,7 +54,6 @@ public class Data extends DataSupport implements Parcelable {
         this.reminder = reminder;
         this.star = star;
     }
-
     public Data(String date, String content, Date exactTime, int pending, int reminder, int star, User user) {
         this.date = date;
         this.content = content;

@@ -71,7 +71,7 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
     private GooeyMenu gooeyMenu;
     private Toast mToast;
     int currentId;
-    private static int currentMemoId = -1;
+//    private static int currentMemoId = -1;
     int currentStar;
     int currentPending;
     int currentReminder;
@@ -213,7 +213,7 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
                             Data newData = new Data(currentDate, newContent, date, currentPending, currentReminder, currentStar);
                             dataDAO.insertData(newData);
                         }
-                        currentMemoId = dataDAO.findCurrentId(); //获取最新的id，如果程序走到这一步，说明此处一定已经插入一条新数据了。此id一定就是刚才插入的那条记录的id。
+//                        currentMemoId = dataDAO.findCurrentId(); //获取最新的id，如果程序走到这一步，说明此处一定已经插入一条新数据了。此id一定就是刚才插入的那条记录的id。
                     } else if (currentContent != null && currentContent != "" && !(richEditText.getText().toString().equals(currentContent))) { //有内容，此处为更新
                         if (AppGlobal.USERNAME != null && !AppGlobal.USERNAME.equals("")) {
                             User currentUser = userDAO.findUser(AppGlobal.USERNAME);
@@ -235,6 +235,8 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
                 confirm.setVisibility(View.GONE);
                 RichEditText richEditText = (RichEditText) findViewById(R.id.input);
                 richEditText.setCursorVisible(false);
+//                startActivity(new Intent(MemorandumActivity.this, MainActivity.class));
+                finish();
                 break;
             default:
         }
@@ -259,18 +261,31 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
         Data data = getIntent().getParcelableExtra("data");
         switch (menuNumber) {
             case 1:
-                Intent getImage = new Intent(Intent.ACTION_GET_CONTENT); //用intent调用相册
-                getImage.addCategory(Intent.CATEGORY_OPENABLE);
-                getImage.setType("image/*");
-                startActivityForResult(getImage, PHOTO_SUCCESS); //执行并接收回掉方法返回的值
+                if (currentId == 0) {
+                    showToast("请先创建备忘录再插入图片");
+                }
+                else {
+                    Intent getImage = new Intent(Intent.ACTION_GET_CONTENT); //用intent调用相册
+                    getImage.addCategory(Intent.CATEGORY_OPENABLE);
+                    getImage.setType("image/*");
+                    startActivityForResult(getImage, PHOTO_SUCCESS); //执行并接收回掉方法返回的值
+                }
                 break;
             case 2:
-                Intent getImageByCamera = new Intent("android.media.action.IMAGE_CAPTURE"); //用intent调用相机
-                startActivityForResult(getImageByCamera, CAMERA_SUCCESS); //执行并接收回掉方法返回的值
+//                if (currentMemoId == -1 && currentId == 0) {
+//                    showToast("请先创建备忘录再插入图片");
+//                }
+                if (currentId == 0) {
+                    showToast("请先创建备忘录再插入图片");
+                }
+                else {
+                    Intent getImageByCamera = new Intent("android.media.action.IMAGE_CAPTURE"); //用intent调用相机
+                    startActivityForResult(getImageByCamera, CAMERA_SUCCESS); //执行并接收回掉方法返回的值
+                }
                 break;
             case 3:
 
-                if (currentId != 0 || currentMemoId != -1) { //根据id判断当前是否已经创建新的备忘录
+                if (currentId != 0 ) { //根据id判断当前是否已经创建新的备忘录
                     timePickerDialog.show(getSupportFragmentManager(), TIMEPICKER_TAG); //显示时间和日期dialog
                     datePickerDialog.setYearRange(1985, 2028);
                     datePickerDialog.show(getSupportFragmentManager(), DATEPICKER_TAG);
@@ -337,22 +352,22 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
                         showToast("已待办");
                     }
                 }
-                if (currentMemoId != -1) {
-                    Data newData = dataDAO.findCurrentData();
-                    if (newData.getPending() == 2) { //根据当前pending的值，给出不同提示，相应的进行值的修改
-                        newData.setPending(1);
-                        newData.update(currentMemoId);
-                        currentPending = newData.getPending();
-                        Log.d(TAG, String.valueOf(currentPending));
-                        showToast("取消待办");
-                    } else {
-                        newData.setPending(2);
-                        newData.update(currentMemoId);
-                        currentPending = newData.getPending();
-                        Log.d(TAG, String.valueOf(currentPending));
-                        showToast("已待办");
-                    }
-                }
+//                if (currentMemoId != -1) {
+//                    Data newData = dataDAO.findCurrentData();
+//                    if (newData.getPending() == 2) { //根据当前pending的值，给出不同提示，相应的进行值的修改
+//                        newData.setPending(1);
+//                        newData.update(currentMemoId);
+//                        currentPending = newData.getPending();
+//                        Log.d(TAG, String.valueOf(currentPending));
+//                        showToast("取消待办");
+//                    } else {
+//                        newData.setPending(2);
+//                        newData.update(currentMemoId);
+//                        currentPending = newData.getPending();
+//                        Log.d(TAG, String.valueOf(currentPending));
+//                        showToast("已待办");
+//                    }
+//                }
                 else {
                     showToast("请先创建备忘录再进行待办");
                 }
@@ -379,22 +394,22 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
                         showToast("已收藏");
                     }
                 }
-                if (currentMemoId != -1) {
-                    Data newData = dataDAO.findCurrentData();
-                    if (newData.getStar() == 2) {
-                        newData.setStar(1);
-                        newData.update(currentMemoId);
-                        currentStar = newData.getStar();
-                        Log.d(TAG, String.valueOf(currentStar));
-                        showToast("取消收藏");
-                    } else {
-                        newData.setStar(2);
-                        newData.update(currentMemoId);
-                        currentStar = newData.getStar();
-                        Log.d(TAG, String.valueOf(currentStar));
-                        showToast("已收藏");
-                    }
-                }
+//                if (currentMemoId != -1) {
+//                    Data newData = dataDAO.findCurrentData();
+//                    if (newData.getStar() == 2) {
+//                        newData.setStar(1);
+//                        newData.update(currentMemoId);
+//                        currentStar = newData.getStar();
+//                        Log.d(TAG, String.valueOf(currentStar));
+//                        showToast("取消收藏");
+//                    } else {
+//                        newData.setStar(2);
+//                        newData.update(currentMemoId);
+//                        currentStar = newData.getStar();
+//                        Log.d(TAG, String.valueOf(currentStar));
+//                        showToast("已收藏");
+//                    }
+//                }
                 else {
                     showToast("请先创建备忘录再进行收藏");
                 }
@@ -413,10 +428,19 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
                     String imagePath = UriToPathUtil.getImageAbsolutePath(this, originalUri); //将uri转换为文件绝对路径
                     Log.i(TAG, imagePath);
                     currentId = intent.getIntExtra("id", 0);
-                    Data newData = new Data(currentId);
-                    newData.setImagePath(imagePath);
-                    newData.update(currentId); //根据id更新图片路径
-                    dataDAO.updateImagePath(imagePath, currentId);
+
+                    if (currentId != 0) {
+                        Data newData = new Data(currentId);
+                        newData.setImagePath(imagePath);
+                        newData.update(currentId); //根据id更新图片路径
+                        dataDAO.updateImagePath(imagePath, currentId);
+                    }
+//                    if (currentMemoId != -1) {
+//                        Data newData = dataDAO.findCurrentData();
+//                        newData.setImagePath(imagePath);
+//                        newData.update(currentMemoId);
+//                        dataDAO.updateImagePath(imagePath, currentMemoId);
+//                    }
                     Bitmap bitmap = null;
                     Bitmap originalBitmap = null;
                     try {
@@ -454,10 +478,18 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
                         String photoPath = BitmapToPathUtil.saveBitmap(this, originalPhotoBitmap);
                         Log.i(TAG, photoPath);
                         currentId = intent.getIntExtra("id", 0);
-                        Data anotherData = new Data(currentId);
-                        anotherData.setImagePath(photoPath);
-                        anotherData.update(currentId);
-                        dataDAO.updateImagePath(photoPath, currentId);
+                        if (currentId != 0) {
+                            Data anotherData = new Data(currentId);
+                            anotherData.setImagePath(photoPath);
+                            anotherData.update(currentId);
+                            dataDAO.updateImagePath(photoPath, currentId);
+                        }
+//                        if (currentMemoId != -1) {
+//                            Data anotherData = dataDAO.findCurrentData();
+//                            anotherData.setImagePath(photoPath);
+//                            anotherData.update(currentMemoId);
+//                            dataDAO.updateImagePath(photoPath, currentMemoId);
+//                        }
                         bitmap = resizeImage(originalPhotoBitmap, 720, 1280);//重新定制图片大小为720*1280
                         //根据Bitmap对象创建ImageSpan对象
                         ImageSpan imageSpan = new ImageSpan(MemorandumActivity.this, bitmap);
@@ -525,15 +557,15 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
         }
         if (notifyTime <= currentTime) {
             showToast("选择时间不能小于当前时间");
-            if (currentMemoId != -1) {
-                Data newData = dataDAO.findCurrentData();
-                newData.setReminder(1);
-                newData.update(currentMemoId);
-            }
-            else {
+//            if (currentMemoId != -1) {
+//                Data newData = dataDAO.findCurrentData();
+//                newData.setReminder(1);
+//                newData.update(currentMemoId);
+//            }
+//            else {
                 data.setReminder(1);
                 data.update(currentId);
-            }
+//            }
             AlarmService.cleanAllNotification();
             return;
         }
@@ -545,17 +577,17 @@ public class MemorandumActivity extends SkinBaseActivity implements GooeyMenu.Go
 
 
 //        Log.i(TAG, currentImagePath);
-        if (currentMemoId != 1) {
-            Data newData = dataDAO.findCurrentData();
-            AlarmService.addNotification(delayTime, "tick", "您有一条新提醒", newData.getContent(), newData.getDate(), newData.getId());
-            newData.setReminder(2);
-            newData.update(currentMemoId);
-        }
-        else {
+//        if (currentMemoId != 1) {
+//            Data newData = dataDAO.findCurrentData();
+//            AlarmService.addNotification(delayTime, "tick", "您有一条新提醒", newData.getContent(), newData.getDate(), newData.getId());
+//            newData.setReminder(2);
+//            newData.update(currentMemoId);
+//        }
+//        else {
             AlarmService.addNotification(delayTime, "tick", "您有一条新提醒", data.getContent(), data.getDate(), data.getId());
             data.setReminder(2);
             data.update(currentId);
-        }
+//        }
         showToast("已提醒");
     }
 }

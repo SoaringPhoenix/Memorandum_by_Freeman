@@ -28,6 +28,7 @@ public class LoginActivity extends SkinBaseActivity implements View.OnClickListe
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private CheckBox rememberPass;
+    static boolean isRemember = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,7 @@ public class LoginActivity extends SkinBaseActivity implements View.OnClickListe
         mEmailView = (EditText) findViewById(R.id.email);   //用户名控件
         mPasswordView = (EditText) findViewById(R.id.password);         //密码控件
         rememberPass = (CheckBox) findViewById(R.id.remember_pass);
-        boolean isRemember = preferences.getBoolean("remember_password", false);
+        isRemember = preferences.getBoolean("remember_password", false);
         if (isRemember) {
             String userName = preferences.getString("userName", "");
             String password = preferences.getString("password", "");
@@ -56,6 +57,16 @@ public class LoginActivity extends SkinBaseActivity implements View.OnClickListe
         Button registButton= (Button) findViewById(R.id.register);
         registButton.setOnClickListener(this);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isRemember) {
+            mEmailView.setText("");
+            mPasswordView.setText("");
+            rememberPass.setChecked(false);
+        }
     }
 
     @Override
@@ -124,6 +135,7 @@ public class LoginActivity extends SkinBaseActivity implements View.OnClickListe
                 }
                 else {
                     editor.clear();
+
                 }
                 editor.apply();
                 Intent intent=new Intent();

@@ -231,15 +231,68 @@
                 android:textColor="#AAAAAA"
                 android:textSize="14sp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.1dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp"
-                android:background="#dadada" />
+            <!--<View-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0.1dp"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:layout_marginLeft="12dp"-->
+                <!--android:layout_marginRight="12dp"-->
+                <!--android:background="#dadada" />-->
         </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:background="#dadada" />
+        <RelativeLayout
+            android:id="@+id/re_reminder"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/list_item_bg_white"
+            android:clickable="true" >
 
+            <TextView
+                android:id="@+id/tv_reminder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:text="@string/reminder"
+                android:textColor="#353535"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/reminder_num"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="20dp"
+                android:layout_toRightOf="@id/tv_reminder"
+                android:ellipsize="end"
+                android:gravity="right"
+                android:singleLine="true"
+                android:textColor="#AAAAAA"
+                android:textSize="14sp" />
+
+            <!--<View-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0.1dp"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:layout_marginLeft="12dp"-->
+                <!--android:layout_marginRight="12dp"-->
+                <!--android:background="#dadada" />-->
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:background="#dadada" />
         <RelativeLayout
             android:id="@+id/re_pending"
             android:layout_width="match_parent"
@@ -280,7 +333,12 @@
                 android:layout_marginRight="12dp"
                 android:background="#dadada" />
         </RelativeLayout>
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5px"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/btn_gray_normal" />
         <RelativeLayout
             android:id="@+id/re_star"
             android:layout_width="match_parent"
@@ -309,6 +367,53 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
                 android:layout_toRightOf="@id/tv_star"
+                android:ellipsize="end"
+                android:textColor="#AAAAAA"
+                android:textSize="14sp" />
+
+            <!--<View-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0.1dp"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:layout_marginLeft="12dp"-->
+                <!--android:layout_marginRight="12dp"-->
+                <!--android:background="#dadada" />-->
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:background="#dadada" />
+        <RelativeLayout
+            android:id="@+id/re_image"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/list_item_bg_white"
+            android:clickable="true" >
+
+            <TextView
+                android:id="@+id/tv_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:text="@string/image"
+                android:textColor="#353535"
+                android:textSize="16sp" />
+
+            <TextView
+                android:gravity="right"
+                android:layout_marginLeft="13dp"
+                android:id="@+id/image_num"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="20dp"
+                android:layout_toRightOf="@id/tv_image"
                 android:ellipsize="end"
                 android:textColor="#AAAAAA"
                 android:textSize="14sp" />

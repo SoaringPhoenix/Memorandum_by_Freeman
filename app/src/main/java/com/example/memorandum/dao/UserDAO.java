@@ -86,6 +86,15 @@ public class UserDAO {
         }
     }
 
+    public void resetNickname(String userName, String nickName) {
+        userList = DataSupport.select("userName", "nickName").where("userName = ?", userName).find(User.class);
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            user.setNickName(nickName);
+            user.updateAll("userName = ?", userName);
+        }
+    }
+
     public void updateImagePath(String imagePath, String userName) {
         User newUser = new User();
         newUser.setImagePath(imagePath);
@@ -112,6 +121,17 @@ public class UserDAO {
             }
         }
         return null;
+    }
+
+    public static int findUserId(String userName) {
+        userList = DataSupport.select("id", "userName").find(User.class);
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            if (userName.equals(user.getUserName())) {
+                return user.getId();
+            }
+        }
+        return 0;
     }
 
 
